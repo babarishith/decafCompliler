@@ -19,7 +19,6 @@ number		digit+
 "//".*				;
 "/*"([^*]|\*+[^*/])*\*+"/" 				; 
 ";"					{return ';'; }
-"int"" "*"main()"		{ return START; }
 [0-9]+				{ yylval.ival = atoi(yytext); return NUMBER; }
 class				{ yylval.sval = strdup(yytext); return CLASS; }
 int					{ yylval.sval = strdup(yytext); return INT; }
@@ -28,7 +27,7 @@ id					{ yylval.sval = strdup(yytext); return ID; }
 if					{ yylval.sval = strdup(yytext); return IF; }
 else				{ yylval.sval = strdup(yytext); return ELSE; }
 new					{ yylval.sval = strdup(yytext); return NEW; }
-null				{ yylval.sval = strdup(yytext); return NULL; }
+null				{ yylval.sval = strdup(yytext); return NUL; }
 print				{ yylval.sval = strdup(yytext); return PRINT; }
 read				{ yylval.sval = strdup(yytext); return READ; }
 return				{ yylval.sval = strdup(yytext); return RETURN; }

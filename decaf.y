@@ -23,7 +23,7 @@ void yyerror(const char *s);
 
 %token <ival> NUMBER
 %token <sval> ID ADDOP MULOP RELOP
-%token INT VOID IF ELSE NEW NULL READ PRINT THIS WHILE RETURN CLASS
+%token INT VOID IF ELSE NEW NUL READ PRINT THIS WHILE RETURN CLASS
 %token OPENB CLOSEB OPENC CLOSEC
 %%
 
@@ -139,7 +139,7 @@ Optional_Expression:
 Expression:
 		Name
 		| NUMBER
-		| NULL
+		| NUL
 		| Name OPENC Arg_List CLOSEC
 		| READ OPENC CLOSEC
 		| New_Expression

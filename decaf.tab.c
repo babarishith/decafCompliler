@@ -125,7 +125,7 @@ extern int yydebug;
     IF = 265,
     ELSE = 266,
     NEW = 267,
-    NULL = 268,
+    NUL = 268,
     READ = 269,
     PRINT = 270,
     THIS = 271,
@@ -482,7 +482,7 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "NUMBER", "ID", "ADDOP", "MULOP",
-  "RELOP", "INT", "VOID", "IF", "ELSE", "NEW", "NULL", "READ", "PRINT",
+  "RELOP", "INT", "VOID", "IF", "ELSE", "NEW", "NUL", "READ", "PRINT",
   "THIS", "WHILE", "RETURN", "CLASS", "OPENB", "CLOSEB", "OPENC", "CLOSEC",
   "';'", "'['", "']'", "','", "'='", "'.'", "$accept", "Program",
   "Class_Declaration", "Class_Body", "Var_Declaration", "Type",

@@ -55,7 +55,7 @@ extern int yydebug;
     IF = 265,
     ELSE = 266,
     NEW = 267,
-    NULL = 268,
+    NUL = 268,
     READ = 269,
     PRINT = 270,
     THIS = 271,
