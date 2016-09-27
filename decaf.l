@@ -19,6 +19,8 @@ number		digit+
 "//".*				;
 "/*"([^*]|\*+[^*/])*\*+"/" 				; 
 ";"					{return ';'; }
+","					{return ','; }
+"."					{return '.'; }
 [0-9]+				{ yylval.ival = atoi(yytext); return NUMBER; }
 class				{ yylval.sval = strdup(yytext); return CLASS; }
 int					{ yylval.sval = strdup(yytext); return INT; }
@@ -37,7 +39,8 @@ while				{ yylval.sval = strdup(yytext); return WHILE; }
 =					{ return '='; }
 "["|"]"				{ return yytext[0];}
 "+"|"-"|"!"|"||"				{ yylval.sval = strdup(yytext); return ADDOP; }
-"*"|"/"|"%"|"&&"			{ yylval.sval = strdup(yytext); return RELOP; }
+"*"|"/"|"%"|"&&"			{ yylval.sval = strdup(yytext); return MULOP; }
+==|<|>|<=|>=|!=		{ yylval.sval = strdup(yytext); return RELOP; }
 "{" 					{ return OPENB ;}
 "}" 					{ return CLOSEB ;}
 "(" 					{ return OPENC ;}

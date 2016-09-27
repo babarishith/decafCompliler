@@ -40,9 +40,19 @@ Class_Declaration:
 
 Class_Body:
 		OPENB CLOSEB
-		| OPENB Var_Declaration CLOSEB
-		| OPENB Method_Declaration CLOSEB
-		| OPENB Var_Declaration Method_Declaration CLOSEB
+		| OPENB Var_Declarations CLOSEB
+		| OPENB Method_Declarations CLOSEB
+		| OPENB Var_Declarations Method_Declarations CLOSEB
+		;
+
+Var_Declarations:
+		Var_Declarations Var_Declaration
+		| Var_Declaration
+		;
+
+Method_Declarations:
+		Method_Declarations Method_Declaration
+		| Method_Declaration
 		;
 
 Var_Declaration:
@@ -56,11 +66,11 @@ Type:
 
 Simple_Type:
 		INT
+		| ID
 		;
 
 Method_Declaration:
-		Result_Type ID OPENB Parameter_List CLOSEB
-		| Method_Body
+		Result_Type ID OPENC Parameter_List CLOSEC Method_Body
 		;
 
 Result_Type:
@@ -78,11 +88,21 @@ Parameter:
 		Type ID
 		;
 
+Local_Var_Declarations:
+		Local_Var_Declarations Local_Var_Declaration
+		| Local_Var_Declaration
+		;
+
+Simple_Statements:
+		Simple_Statements Simple_Statement
+		| Simple_Statement
+		;
+
 Method_Body:
 		OPENB CLOSEB
-		| OPENB Local_Var_Declaration CLOSEB
-		| OPENB Simple_Statement CLOSEB
-		| OPENB Local_Var_Declaration Simple_Statement CLOSEB
+		| OPENB Local_Var_Declarations CLOSEB
+		| OPENB Simple_Statements CLOSEB
+		| OPENB Local_Var_Declarations Simple_Statements CLOSEB
 		;
 
 Local_Var_Declaration:
@@ -91,7 +111,7 @@ Local_Var_Declaration:
 
 Statement:
 		Simple_Statement
-		| OPENB Statement Simple_Statement CLOSEB
+		| OPENB Simple_Statements CLOSEB
 		;
 
 Simple_Statement:
