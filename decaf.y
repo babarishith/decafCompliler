@@ -21,10 +21,9 @@ void yyerror(const char *s);
 	float fval;
 	char *sval;}
 
-%token <ival> INT
-%token <fval> FLOAT
-%token <sval> STRING ID TYPE BOOL ADDOP MULOP
-%token START 
+%token <ival> NUMBER
+%token <sval> ID ADDOP MULOP RELOP
+%token INT VOID IF ELSE NEW NULL READ PRINT THIS WHILE RETURN CLASS
 %token OPENB CLOSEB OPENC CLOSEC
 %%
 
@@ -40,10 +39,10 @@ Class_Declaration:
 		;
 
 Class_Body:
-		'{' '}'
-		| '{' Var_Declaration '}'
-		| '{' Method_Declaration '}'
-		| '{' Var_Declaration Method_Declaration '}'
+		OPENB CLOSEB
+		| OPENB Var_Declaration CLOSEB
+		| OPENB Method_Declaration CLOSEB
+		| OPENB Var_Declaration Method_Declaration CLOSEB
 		;
 
 Var_Declaration:
@@ -52,7 +51,7 @@ Var_Declaration:
 
 Type:
 		Simple_Type
-		| Siple_Type '[' ']'
+		| Simple_Type '[' ']'
 		;
 
 Simple_Type:
@@ -60,7 +59,7 @@ Simple_Type:
 		;
 
 Method_Declaration:
-		Result_Type ID '{' Parameter_List '}'
+		Result_Type ID OPENB Parameter_List CLOSEB
 		| Method_Body
 		;
 
@@ -70,7 +69,7 @@ Result_Type:
 		;
 
 Parameter_List:
-		epsilon
+		/* empty */
 		| Parameter_List ',' Parameter
 		| Parameter
 		;
@@ -80,10 +79,10 @@ Parameter:
 		;
 
 Method_Body:
-		'{' '}'
-		| '{' Local_Var_Declaration '}'
-		| '{' Simple_Statement '}'
-		| '{' Local_Var_Declaration Simple_Satement '}'
+		OPENB CLOSEB
+		| OPENB Local_Var_Declaration CLOSEB
+		| OPENB Simple_Statement CLOSEB
+		| OPENB Local_Var_Declaration Simple_Statement CLOSEB
 		;
 
 Local_Var_Declaration:
@@ -92,25 +91,25 @@ Local_Var_Declaration:
 
 Statement:
 		Simple_Statement
-		| '{' Statement Simple_Statement '}'
+		| OPENB Statement Simple_Statement CLOSEB
 		;
 
-Simple_Staement:
+Simple_Statement:
 		';'
-		| Name = Expression ';'
-		| Name '(' Arg_List ')' ';'
-		| PRINT '(' Arg_List ')' ';'
+		| Name '=' Expression ';'
+		| Name OPENC Arg_List CLOSEC ';'
+		| PRINT OPENC Arg_List CLOSEC ';'
 		| Conditional_Statement
-		| WHILE '(' Expression ')' Statement
+		| WHILE OPENC Expression CLOSEC Statement
 		| RETURN Optional_Expression ';'
 		;
 
 Name:
 		Variable_Access
-		| Variable_Acess'.'Field_Access
+		| Variable_Access'.'Field_Access
 		;
 
-Variable_Acess:
+Variable_Access:
 		THIS
 		| ID
 		| ID '[' Expression ']'
@@ -122,18 +121,18 @@ Field_Access:
 		;
 
 Arg_List:
-		epsilon
+		/* empty */
 		| Arg_List ',' Expression
 		| Expression
 		;
 
 Conditional_Statement:
-		IF '(' Expression ')' Statement
-		| IF '(' Expressoin ')' Statement ELSE Satement
+		IF OPENC Expression CLOSEC Statement
+		| IF OPENC Expression CLOSEC Statement ELSE Statement
 		;
 
 Optional_Expression:
-		epsilon
+		/* empty */
 		| Expression
 		;
 
@@ -141,18 +140,18 @@ Expression:
 		Name
 		| NUMBER
 		| NULL
-		| Name '(' Arg_List ')'
-		| READ '(' ')'
+		| Name OPENC Arg_List CLOSEC
+		| READ OPENC CLOSEC
 		| New_Expression
 		| ADDOP Expression
 		| Expression RELOP Expression
-		| Expression Sum_Op Expression
+		| Expression ADDOP Expression
 		| Expression MULOP Expression
-		| '(' Expression ')'
+		| OPENC Expression CLOSEC
 		;
 
 New_Expression:
-		NEW ID '(' ')'
+		NEW ID OPENC CLOSEC
 		| NEW INT '[' Expression ']'
 		| NEW ID '[' Expression ']'
 		;

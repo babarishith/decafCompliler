@@ -34,8 +34,6 @@ read				{ yylval.sval = strdup(yytext); return READ; }
 return				{ yylval.sval = strdup(yytext); return RETURN; }
 this				{ yylval.sval = strdup(yytext); return THIS; }
 while				{ yylval.sval = strdup(yytext); return WHILE; }
-bool 				{ yylval.sval = strdup("Boolean"); return TYPE; }
-if|else|while|for|int|float { cout  << "Keyword" << endl << yytext << endl; }
 [a-zA-Z]+[a-zA-Z0-9\_]*		{ yylval.sval = strdup(yytext); return ID; }
 =					{ return '='; }
 "["|"]"				{ return yytext[0];}
@@ -44,5 +42,5 @@ if|else|while|for|int|float { cout  << "Keyword" << endl << yytext << endl; }
 "{" 					{ return OPENB ;}
 "}" 					{ return CLOSEB ;}
 "(" 					{ return OPENC ;}
-")" 					{ return CLOSEB ;}
+")" 					{ return CLOSEC ;}
 %%
