@@ -31,80 +31,130 @@ void yyerror(const char *s);
 //grammar
 
 Program:
-		START OPENB Declarations Statements CLOSEB { outfile << "Program encountered" << endl;}
+		Program Class_Declaration
+		| Class_Declaration
 		;
 
-Declarations:
-		Declarations Declaration 
-		| Declaration
+Class_Declaration:
+		CLASS ID Class_Body
 		;
 
-Declaration:
-		TYPE ID ';' { outfile << $1 << " declaration encountered" << endl << "Id=" << $2 << endl;}
-		| TYPE ID '[' INT ']' ';' { outfile << $1 << " declaration encountered" << endl << "Id=" << $2 << endl << "Size=" << $4 << endl;}
+Class_Body:
+		'{' '}'
+		| '{' Var_Declaration '}'
+		| '{' Method_Declaration '}'
+		| '{' Var_Declaration Method_Declaration '}'
 		;
 
-Statements:
-		Statements Statement
-		| Statement
+Var_Declaration:
+		Type ID ';'
+		;
+
+Type:
+		Simple_Type
+		| Siple_Type '[' ']'
+		;
+
+Simple_Type:
+		INT
+		;
+
+Method_Declaration:
+		Result_Type ID '{' Parameter_List '}'
+		| Method_Body
+		;
+
+Result_Type:
+		Type
+		| VOID
+		;
+
+Parameter_List:
+		epsilon
+		| Parameter_List ',' Parameter
+		| Parameter
+		;
+
+Parameter:
+		Type ID
+		;
+
+Method_Body:
+		'{' '}'
+		| '{' Local_Var_Declaration '}'
+		| '{' Simple_Statement '}'
+		| '{' Local_Var_Declaration Simple_Satement '}'
+		;
+
+Local_Var_Declaration:
+		Type ID ';'
 		;
 
 Statement:
-		';'
-		| Assignment
+		Simple_Statement
+		| '{' Statement Simple_Statement '}'
 		;
 
-Assignment:
-		ID '=' Expression ';' { outfile << "Assignment operation encountered" << endl;}
-		| ID '[' Expression ']' '=' Expression ';' { outfile << "Assignment operation encountered" << endl;}
+Simple_Staement:
+		';'
+		| Name = Expression ';'
+		| Name '(' Arg_List ')' ';'
+		| PRINT '(' Arg_List ')' ';'
+		| Conditional_Statement
+		| WHILE '(' Expression ')' Statement
+		| RETURN Optional_Expression ';'
+		;
+
+Name:
+		Variable_Access
+		| Variable_Acess'.'Field_Access
+		;
+
+Variable_Acess:
+		THIS
+		| ID
+		| ID '[' Expression ']'
+		;
+
+Field_Access:
+		ID
+		| ID '[' Expression ']'
+		;
+
+Arg_List:
+		epsilon
+		| Arg_List ',' Expression
+		| Expression
+		;
+
+Conditional_Statement:
+		IF '(' Expression ')' Statement
+		| IF '(' Expressoin ')' Statement ELSE Satement
+		;
+
+Optional_Expression:
+		epsilon
+		| Expression
 		;
 
 Expression:
-		Expression ADDOP Term { 
-			char c = *$2;
-			switch(c) {
-				case '+':
-					outfile << "Addition expression encountered" << endl;
-					break;
-					
-				case '-':
-					outfile << "Subtraction expression encountered" << endl;
-					break;
-			}
-		}
-		| Term
+		Name
+		| NUMBER
+		| NULL
+		| Name '(' Arg_List ')'
+		| READ '(' ')'
+		| New_Expression
+		| ADDOP Expression
+		| Expression RELOP Expression
+		| Expression Sum_Op Expression
+		| Expression MULOP Expression
+		| '(' Expression ')'
 		;
 
-Term:
-		Term MULOP Factor {
-			char c = *$2;
-			switch(c) {
-				case '*':
-					outfile << "Multiplication expression encountered" << endl;
-					break;
-					
-				case '/':
-					outfile << "Division expression encountered" << endl;
-					break;
-					
-				case '%':
-					outfile << "Modulus expression enoutfileered" << endl;
-					break;
-			}
-		}
-		| Factor
-		;
-
-Factor:
-		ID
-		| ID '[' Expression ']'
-		| Literal
-		| OPENC Expression CLOSEC
-		;
-
-Literal:
-		INT {outfile << "Integer literal encountered" << endl << "Value=" << $1 << endl;}
-		| BOOL {outfile << "Boolean literal encountered" << endl << "Value=" << $1 << endl;}
+New_Expression:
+		NEW ID '(' ')'
+		| NEW INT '[' Expression ']'
+		| NEW ID '[' Expression ']'
 		;
 
 %%

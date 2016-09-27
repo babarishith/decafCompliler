@@ -1,10 +1,8 @@
-a.out: lex.yy.c Assignment2.tab.c Assignment2.tab.h
-	g++ Assignment2.tab.c lex.yy.c -lfl 
+decaf: lex.yy.c decaf.tab.c decaf.tab.h
+	g++ decaf.tab.c lex.yy.c -lfl -o decaf
 
-Assignment2.tab.c Assignment2.tab.h: Assignment2.y
-	bison -d Assignment2.y
+decaf.tab.c decaf.tab.h: decaf.y
+	bison -d decaf.y
 
-lex.yy.c: Assignment2.l Assignment2.tab.h
-	flex Assignment2.l
-
-
+lex.yy.c: decaf.l decaf.tab.h
+	flex decaf.l
