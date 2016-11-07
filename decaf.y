@@ -8,8 +8,10 @@ using namespace std;
 extern "C" int yylex();
 extern "C" int yyparse();
 extern "C" FILE *yyin;
+extern "C" ofstream outflex;
 
 ofstream outfile;
+//ofstream outflex;
 //int line_num=1;
 //int flag = 0;
 
@@ -22,159 +24,147 @@ void yyerror(const char *s);
 	char *sval;}
 
 %token <ival> NUMBER
-%token <sval> ID ADDOP MULOP RELOP
+%token <sval> ID ADDOP MULOP RELOP UNARYOP
 %token INT VOID IF ELSE NEW NUL READ PRINT THIS WHILE RETURN CLASS
 %token OPENB CLOSEB OPENC CLOSEC
+%left RELOP
+%left ADDOP
+%left MULOP
+%left UNARYOP
 %%
 
 //grammar
 
-Program:
-		Program Class_Declaration
-		| Class_Declaration
-		;
+program : CLASS IDENTIFIER OPEN_CURLYBRACE field_decls method_decls CLOSE_CURLYBRACE { $$ = new ASTProgram(std::string($2), $4, $5); start = $$; }
+				| CLASS IDENTIFIER OPEN_CURLYBRACE field_decls CLOSE_CURLYBRACE  { $$ = new ASTProgram(std::string($2), $4, NULL); start = $$; }
+				| CLASS IDENTIFIER OPEN_CURLYBRACE method_decls CLOSE_CURLYBRACE { $$ = new ASTProgram(std::string($2), NULL, $4); start = $$; }
+				| CLASS IDENTIFIER OPEN_CURLYBRACE CLOSE_CURLYBRACE { $$ = new ASTProgram(std::string($2), NULL, NULL); start = $$; }
+				;
 
-Class_Declaration:
-		CLASS ID Class_Body
-		;
+field_decls : field_decl { $$ = new std::vector<ASTFieldDecl *>(); $$->push_back($1); }
+								| field_decls field_decl { $1->push_back($2); $$ = $1; }
+								;
 
-Class_Body:
-		OPENB CLOSEB
-		| OPENB Var_Declarations CLOSEB
-		| OPENB Method_Declarations CLOSEB
-		| OPENB Var_Declarations Method_Declarations CLOSEB
-		;
+field_decl : type identifier_list SEMICOLON { $$ = new ASTFieldDecl($2, $1); }
+					 | type identifier_array_list SEMICOLON { $$ = new ASTFieldDecl($2, $1); }
+					 ;
 
-Var_Declarations:
-		Var_Declarations Var_Declaration
-		| Var_Declaration
-		;
+identifier_list : IDENTIFIER { $$ = new std::vector<ASTVarIdentifier *>(); $$->push_back(new ASTVarIdentifier(std::string($1))); }
+								| identifier_list COMMA IDENTIFIER { $1->push_back(new ASTVarIdentifier(std::string($3))); $$ = $1; }
+								;
 
-Method_Declarations:
-		Method_Declarations Method_Declaration
-		| Method_Declaration
-		;
+identifier_array_list : identifier_array { $$ = new std::vector<ASTArrayIdentifier *>(); $$->push_back($1); }
+											| identifier_array_list COMMA identifier_array { $1->push_back($3); $$ = $1; }
+											;
 
-Var_Declaration:
-		Type ID ';'
-		;
+identifier_array : IDENTIFIER OPEN_SQUAREBRACKET INT_VALUE CLOSE_SQUAREBRACKET { $$ = new ASTArrayIdentifier(std::string($1), $3); }
+								 ;
 
-Type:
-		Simple_Type
-		| Simple_Type '[' ']'
-		;
+method_decls : method_decl { $$ = new std::vector<ASTMethodDecl *>(); $$->push_back($1); }
+								 | method_decls method_decl { $1->push_back($2); $$ = $1; }
+								 ;
 
-Simple_Type:
-		INT
-		| ID
-		;
+method_decl : type IDENTIFIER OPEN_PARANTHESIS type_identifier_list CLOSE_PARANTHESIS block { $$ = new ASTMethodDecl(std::string($2), $1, $4, $6); }
+						| type IDENTIFIER OPEN_PARANTHESIS CLOSE_PARANTHESIS block { $$ = new ASTMethodDecl(std::string($2), $1, NULL, $5); }
+						| VOID IDENTIFIER OPEN_PARANTHESIS type_identifier_list CLOSE_PARANTHESIS block { $$ = new ASTMethodDecl(std::string($2), Datatype::void_type, $4, $6); }
+						| VOID IDENTIFIER OPEN_PARANTHESIS CLOSE_PARANTHESIS block { $$ = new ASTMethodDecl(std::string($2), Datatype::void_type, NULL, $5); }
+						;
 
-Method_Declaration:
-		Result_Type ID OPENC Parameter_List CLOSEC Method_Body
-		;
+type_identifier_list : type_identifier { $$ = new std::vector<ASTTypeIdentifier *>(); $$->push_back($1); }
+										 | type_identifier_list COMMA type_identifier { $1->push_back($3); $$ = $1; }
+										 ;
 
-Result_Type:
-		Type
-		| VOID
-		;
+type_identifier : type IDENTIFIER { $$ = new ASTTypeIdentifier(std::string($2), $1); }
+								;
 
-Parameter_List:
-		/* empty */
-		| Parameter_List ',' Parameter
-		| Parameter
-		;
+block : OPEN_CURLYBRACE var_decl_list statement_list CLOSE_CURLYBRACE { $$ = new ASTBlockStatement($3, $2); } 
+			| OPEN_CURLYBRACE var_decl_list CLOSE_CURLYBRACE { $$ = new ASTBlockStatement(NULL, $2); }
+			| OPEN_CURLYBRACE statement_list CLOSE_CURLYBRACE { $$ = new ASTBlockStatement($2, NULL); }
+			| OPEN_CURLYBRACE CLOSE_CURLYBRACE { $$ = new ASTBlockStatement(NULL, NULL); }
+			;
 
-Parameter:
-		Type ID
-		;
+statement_list : statement { $$ = new std::vector<ASTStatement *>(); $$->push_back($1); }
+							 | statement_list statement { $1->push_back($2); $$ = $1; }
+							 ;
 
-Local_Var_Declarations:
-		Local_Var_Declarations Local_Var_Declaration
-		| Local_Var_Declaration
-		;
+var_decl_list : var_decl { $$ = new std::vector<ASTVarDecl *>(); $$->push_back($1); }
+							| var_decl_list var_decl { $1->push_back($2); $$ = $1; }
+							;
 
-Simple_Statements:
-		Simple_Statements Simple_Statement
-		| Simple_Statement
-		;
+var_decl : type identifier_list SEMICOLON { $$ = new ASTVarDecl($2, $1); }
+				 ;
 
-Method_Body:
-		OPENB CLOSEB
-		| OPENB Local_Var_Declarations CLOSEB
-		| OPENB Simple_Statements CLOSEB
-		| OPENB Local_Var_Declarations Simple_Statements CLOSEB
-		;
+type : INT { $$ = Datatype::int_type; }
+		 | BOOLEAN { $$ = Datatype::bool_type; }
+		 ;
 
-Local_Var_Declaration:
-		Type ID ';'
-		;
+statement : SEMICOLON { $$ = NULL; }
+					| location assign_op expr SEMICOLON { $$ = new ASTAssignmentStatement($2, $1, $3); }
+					| method_call SEMICOLON { $$ = $1; }
+					| IF OPEN_PARANTHESIS expr CLOSE_PARANTHESIS block ELSE block { $$ = new ASTIfStatement($3, $5, $7); }
+					| IF OPEN_PARANTHESIS expr CLOSE_PARANTHESIS block { $$ = new ASTIfStatement($3, $5, NULL); }
+					| FOR IDENTIFIER EQUAL expr COMMA expr block { $$ = new ASTForStatement($4, $6, $7, std::string($2)); }
+					| RETURN expr SEMICOLON { $$ = new ASTReturnStatement($2); }
+					| RETURN SEMICOLON { $$ = new ASTReturnStatement(NULL); }
+					| BREAK SEMICOLON { $$ = new ASTBreakStatement(); }
+					| CONTINUE SEMICOLON { $$ = new ASTContinueStatement(); }
+					| block { $$ = $1; }
+					;
 
-Statement:
-		Simple_Statement
-		| OPENB Simple_Statements CLOSEB
-		;
+assign_op : EQUAL { $$ = AssignOp::equal; }
+					| PLUSEQUAL { $$ = AssignOp::plus_equal; }
+					| MINUSEQUAL { $$ = AssignOp::minus_equal; }
+					;
 
-Simple_Statement:
-		';'
-		| Name '=' Expression ';'
-		| Name OPENC Arg_List CLOSEC ';'
-		| PRINT OPENC Arg_List CLOSEC ';'
-		| Conditional_Statement
-		| WHILE OPENC Expression CLOSEC Statement
-		| RETURN Optional_Expression ';'
-		;
+method_call : IDENTIFIER OPEN_PARANTHESIS expr_list CLOSE_PARANTHESIS { $$ = new ASTNormalMethod(std::string($1), $3); }
+						| IDENTIFIER OPEN_PARANTHESIS CLOSE_PARANTHESIS { $$ = new ASTNormalMethod(std::string($1), NULL); }
+						| CALLOUT OPEN_PARANTHESIS STRING_VALUE COMMA callout_arg_list CLOSE_PARANTHESIS { $$ = new ASTCalloutMethod(std::string($3), $5); }
+						| CALLOUT OPEN_PARANTHESIS STRING_VALUE CLOSE_PARANTHESIS { $$ = new ASTCalloutMethod(std::string($3), NULL); }
+						;
+	
+expr_list : expr { $$ = new std::vector<ASTExpression *>(); $$->push_back($1); }
+					| expr_list COMMA expr { $1->push_back($3); $$ = $1; }
+					;
 
-Name:
-		Variable_Access
-		| Variable_Access'.'Field_Access
-		;
+callout_arg_list : callout_arg { $$ = new std::vector<ASTCalloutArg *>(); $$->push_back($1); }
+								 | callout_arg_list COMMA callout_arg { $1->push_back($3); $$ = $1; }
+								 ;
 
-Variable_Access:
-		THIS
-		| ID
-		| ID '[' Expression ']'
-		;
+location : IDENTIFIER { $$ = new ASTVarLocation(std::string($1)); }
+				 | IDENTIFIER OPEN_SQUAREBRACKET expr CLOSE_SQUAREBRACKET { $$ = new ASTArrayLocation(std::string($1), $3); }
+				 ;
 
-Field_Access:
-		ID
-		| ID '[' Expression ']'
-		;
+expr : location { $$ = $1; }
+		 | method_call { $$ = $1; }
+		 | literal { $$ = $1; }
+		 | expr OR expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::or_op); }
+		 | expr AND expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::and_op); }
+		 | expr EQUALEQUAL expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::equalequal_op); }
+		 | expr NOTEQUAL expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::notequal_op); }
+		 | expr LESSTHAN expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::lessthan_op); }
+		 | expr LESSEQUAL expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::lessequal_op); }
+		 | expr GREATEREQUAL expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::greaterequal_op); }
+		 | expr GREATERTHAN expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::greaterthan_op); }
+		 | expr PLUS expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::plus_op); }
+		 | expr MINUS expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::minus_op); }
+		 | expr MULTIPLY expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::multiply_op); }
+		 | expr DIVIDE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::divide_op); }
+		 | expr MODULO expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::modulo_op); }
+		 | NOT expr { $$ = new ASTUnaryOperationExpression($2, UnOp::not_op); }
+		 | MINUS expr %prec UMINUS { $$ = new ASTUnaryOperationExpression($2, UnOp::minus_op); }
+		 | OPEN_PARANTHESIS expr CLOSE_PARANTHESIS { $$ = $2; }
+		 ;
 
-Arg_List:
-		/* empty */
-		| Arg_List ',' Expression
-		| Expression
-		;
+callout_arg : expr  { $$ = new ASTExpressionCalloutArg($1); }
+						| STRING_VALUE { $$ = new ASTStringCalloutArg(std::string($1)); }
+						;
 
-Conditional_Statement:
-		IF OPENC Expression CLOSEC Statement
-		| IF OPENC Expression CLOSEC Statement ELSE Statement
-		;
+literal : INT_VALUE { $$ = new ASTIntegerLiteralExpression($1); }
+				| CHAR_VALUE { $$ = new ASTCharLiteralExpression($1); }
+				| TRUE { $$ = new ASTTrueLiteralExpression(); }
+				| FALSE { $$ = new ASTFalseLiteralExpression(); }
+				;
 
-Optional_Expression:
-		/* empty */
-		| Expression
-		;
-
-Expression:
-		Name
-		| NUMBER
-		| NUL
-		| Name OPENC Arg_List CLOSEC
-		| READ OPENC CLOSEC
-		| New_Expression
-		| ADDOP Expression
-		| Expression RELOP Expression
-		| Expression ADDOP Expression
-		| Expression MULOP Expression
-		| OPENC Expression CLOSEC
-		;
-
-New_Expression:
-		NEW ID OPENC CLOSEC
-		| NEW INT '[' Expression ']'
-		| NEW ID '[' Expression ']'
-		;
 
 %%
 
@@ -186,6 +176,7 @@ int main( int argc, char *argv[]) {
 		yyin = fopen(argv[1], "r");
 	}
 	outfile.open("bison_output.txt");
+	outflex.open("flex_output.txt");
 	//yylex();
 	do 
 	{
@@ -193,6 +184,7 @@ int main( int argc, char *argv[]) {
 	} while (!feof(yyin));
 
 	cout << "Success" << endl;
+	outflex.close();
 	outfile.close();
 }
 

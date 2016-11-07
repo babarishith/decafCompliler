@@ -1,8 +1,11 @@
 %{
 #include <iostream>
+#include <fstream>
 #include "decaf.tab.h"
 using namespace std;
 #define YY_DECL extern "C" int yylex()
+//extern "C" ofstream *outflex;
+ofstream outflex;
 int line_num=1;
 int flag = 0;
 %}
@@ -12,6 +15,8 @@ digit		[0-9]
 alpha		letter | digit | _
 id			letter alpha*
 number		digit+
+hex			[0-9a-fA-F]
+char ([\40-\176]{-}['"\\])|\\n|\\t|\\\\|\\\"|\\\'
 
 %%
 [ \t]				;
@@ -21,28 +26,48 @@ number		digit+
 ";"					{return ';'; }
 ","					{return ','; }
 "."					{return '.'; }
-[0-9]+				{ yylval.ival = atoi(yytext); return NUMBER; }
-class				{ yylval.sval = strdup(yytext); return CLASS; }
-int					{ yylval.sval = strdup(yytext); return INT; }
-void				{ yylval.sval = strdup(yytext); return VOID; }
-id					{ yylval.sval = strdup(yytext); return ID; }
-if					{ yylval.sval = strdup(yytext); return IF; }
-else				{ yylval.sval = strdup(yytext); return ELSE; }
-new					{ yylval.sval = strdup(yytext); return NEW; }
-null				{ yylval.sval = strdup(yytext); return NUL; }
-print				{ yylval.sval = strdup(yytext); return PRINT; }
-read				{ yylval.sval = strdup(yytext); return READ; }
-return				{ yylval.sval = strdup(yytext); return RETURN; }
-this				{ yylval.sval = strdup(yytext); return THIS; }
-while				{ yylval.sval = strdup(yytext); return WHILE; }
-[a-zA-Z]+[a-zA-Z0-9\_]*		{ yylval.sval = strdup(yytext); return ID; }
-=					{ return '='; }
+[0-9]+				{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUMBER; }
+0x{hex}+			{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUMBER; }
+class				{ yylval.sval = strdup(yytext); outflex << "CLASS" << endl ; return CLASS; }
+"\"{char}*\""		{ yylval.sval = strdup(yytext); outflex << "CLASS" << endl ; return STRING; } 
+"\'{char}\'"		{ yylval.sval = strdup(yytext[1]); outflex << "CLASS" << endl ; return CHAR; } 
+int					{ yylval.sval = strdup(yytext);outflex << "INT_DECLARATOIN" << endl ; return INT; }
+void				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return VOID; }
+boolean				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return BOOL; }
+break				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return BREAK; }
+continue			{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return CONTINUE; }
+callout				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return CALLOUT; }
+id					{ yylval.sval = strdup(yytext); outflex << "ID:" << yytext << endl ; return ID; }
+if					{ yylval.sval = strdup(yytext); outflex << "IF" << endl; return IF; }
+else				{ yylval.sval = strdup(yytext);	outflex << "ELSE" << endl; return ELSE; }
+new					{ yylval.sval = strdup(yytext); outflex << "NEW" << endl; return NEW; }
+false				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return FALSE; }
+true				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return TRUE; }
+for					{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return FOR; }
+null				{ yylval.sval = strdup(yytext); outflex << "NULL" << endl;return NUL; }
+print				{ yylval.sval = strdup(yytext); outflex << "PRINT" << endl; return PRINT; }
+read				{ yylval.sval = strdup(yytext); outflex << "READ" << endl; return READ; }
+return				{ yylval.sval = strdup(yytext); outflex << "RETURN" << endl; return RETURN; }
+this				{ yylval.sval = strdup(yytext); outflex << "THIS" << endl; return THIS; }
+while				{ yylval.sval = strdup(yytext); outflex << "WHILE" << endl; return WHILE; }
+[a-zA-Z]+[a-zA-Z0-9\_]*		{ yylval.sval = strdup(yytext); outflex << "STRING:" << yytext << endl ;return ID; }
+=					{ yylval.sval = strdup(yytext); outflex << "ASSIGNMENT" << endl;return EQ; }
+-=					{ yylval.sval = strdup(yytext); outflex << "ASSIGNMENT" << endl;return ME; }
+"+="				{ yylval.sval = strdup(yytext); outflex << "ASSIGNMENT" << endl;return PE; }
 "["|"]"				{ return yytext[0];}
-"+"|"-"|"!"|"||"				{ yylval.sval = strdup(yytext); return ADDOP; }
-"*"|"/"|"%"|"&&"			{ yylval.sval = strdup(yytext); return MULOP; }
-==|<|>|<=|>=|!=		{ yylval.sval = strdup(yytext); return RELOP; }
-"{" 					{ return OPENB ;}
-"}" 					{ return CLOSEB ;}
-"(" 					{ return OPENC ;}
-")" 					{ return CLOSEC ;}
-%%
+"+"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return PLUS; }
+"-"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return MINUS; }
+"*"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return MUL; }
+"/"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return DIV; }
+"!"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return NOT; }
+"!="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return NOTEQ; }
+"<="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return LE; }
+"<"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return LT; }
+">"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return GT; }
+">="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return GE; }
+"=="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return EE; }
+"{" 					{outflex << "OPENB" << endl; return OPENB ;}
+"}" 					{ outflex << "CLOSEB" << endl;return CLOSEB ;}
+"(" 					{ outflex << "OPENC" << endl; return OPENC ;}
+")" 					{ outflex << "CLOSEC" << endl; return CLOSEC ;}
+%%	

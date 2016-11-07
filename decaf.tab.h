@@ -50,22 +50,23 @@ extern int yydebug;
     ADDOP = 260,
     MULOP = 261,
     RELOP = 262,
-    INT = 263,
-    VOID = 264,
-    IF = 265,
-    ELSE = 266,
-    NEW = 267,
-    NUL = 268,
-    READ = 269,
-    PRINT = 270,
-    THIS = 271,
-    WHILE = 272,
-    RETURN = 273,
-    CLASS = 274,
-    OPENB = 275,
-    CLOSEB = 276,
-    OPENC = 277,
-    CLOSEC = 278
+    UNARYOP = 263,
+    INT = 264,
+    VOID = 265,
+    IF = 266,
+    ELSE = 267,
+    NEW = 268,
+    NUL = 269,
+    READ = 270,
+    PRINT = 271,
+    THIS = 272,
+    WHILE = 273,
+    RETURN = 274,
+    CLASS = 275,
+    OPENB = 276,
+    CLOSEB = 277,
+    OPENC = 278,
+    CLOSEC = 279
   };
 #endif
 
@@ -74,13 +75,13 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 19 "decaf.y" /* yacc.c:1909  */
+#line 21 "decaf.y" /* yacc.c:1909  */
 
 	int ival;
 	float fval;
 	char *sval;
 
-#line 84 "decaf.tab.h" /* yacc.c:1909  */
+#line 85 "decaf.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
