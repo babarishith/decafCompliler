@@ -4,9 +4,11 @@
 #include <fstream>
 #include <vector>
 #include <string>
+using namespace std;
+ofstream outfile;
 #include "ast.h"
 #include "visitor.h"
-using namespace std;
+
 
 //Stuff from flex
 extern "C" int yylex();
@@ -15,7 +17,6 @@ extern "C" FILE *yyin;
 extern "C" ofstream outflex;
 ASTProgram * start;
 
-ofstream outfile;
 //ofstream outflex;
 //int line_num=1;
 //int flag = 0;

@@ -69,9 +69,11 @@
 #include <fstream>
 #include <vector>
 #include <string>
+using namespace std;
+ofstream outfile;
 #include "ast.h"
 #include "visitor.h"
-using namespace std;
+
 
 //Stuff from flex
 extern "C" int yylex();
@@ -80,14 +82,13 @@ extern "C" FILE *yyin;
 extern "C" ofstream outflex;
 ASTProgram * start;
 
-ofstream outfile;
 //ofstream outflex;
 //int line_num=1;
 //int flag = 0;
 
 void yyerror(const char *s);
 
-#line 91 "decaf.tab.c" /* yacc.c:339  */
+#line 92 "decaf.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -169,7 +170,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 26 "decaf.y" /* yacc.c:355  */
+#line 27 "decaf.y" /* yacc.c:355  */
 
 	char *sval;
 	int ival;
@@ -199,7 +200,7 @@ union YYSTYPE
 	ASTCalloutArg * callout_arg;
 	ASTLiteralExpression * literal;
 
-#line 203 "decaf.tab.c" /* yacc.c:355  */
+#line 204 "decaf.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -216,7 +217,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 220 "decaf.tab.c" /* yacc.c:358  */
+#line 221 "decaf.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -517,15 +518,15 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   120,   120,   121,   122,   123,   126,   127,   130,   131,
-     134,   135,   138,   139,   142,   145,   146,   149,   150,   151,
-     152,   155,   156,   159,   162,   163,   164,   165,   168,   169,
-     172,   173,   176,   179,   180,   183,   184,   185,   186,   187,
-     188,   189,   190,   191,   192,   193,   196,   197,   198,   201,
-     202,   203,   204,   207,   208,   211,   212,   215,   216,   219,
-     220,   221,   222,   223,   224,   225,   226,   227,   228,   229,
-     230,   231,   232,   233,   234,   235,   236,   237,   240,   241,
-     244,   245,   246,   247
+       0,   121,   121,   122,   123,   124,   127,   128,   131,   132,
+     135,   136,   139,   140,   143,   146,   147,   150,   151,   152,
+     153,   156,   157,   160,   163,   164,   165,   166,   169,   170,
+     173,   174,   177,   180,   181,   184,   185,   186,   187,   188,
+     189,   190,   191,   192,   193,   194,   197,   198,   199,   202,
+     203,   204,   205,   208,   209,   212,   213,   216,   217,   220,
+     221,   222,   223,   224,   225,   226,   227,   228,   229,   230,
+     231,   232,   233,   234,   235,   236,   237,   238,   241,   242,
+     245,   246,   247,   248
 };
 #endif
 
@@ -1452,499 +1453,499 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 120 "decaf.y" /* yacc.c:1646  */
+#line 121 "decaf.y" /* yacc.c:1646  */
     { (yyval.program) = new ASTProgram(string((yyvsp[-4].sval)), (yyvsp[-2].field_decls), (yyvsp[-1].method_decls)); start = (yyval.program); }
-#line 1458 "decaf.tab.c" /* yacc.c:1646  */
+#line 1459 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 121 "decaf.y" /* yacc.c:1646  */
+#line 122 "decaf.y" /* yacc.c:1646  */
     { (yyval.program) = new ASTProgram(string((yyvsp[-3].sval)), (yyvsp[-1].field_decls), NULL); start = (yyval.program); }
-#line 1464 "decaf.tab.c" /* yacc.c:1646  */
+#line 1465 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 4:
-#line 122 "decaf.y" /* yacc.c:1646  */
+#line 123 "decaf.y" /* yacc.c:1646  */
     { (yyval.program) = new ASTProgram(string((yyvsp[-3].sval)), NULL, (yyvsp[-1].method_decls)); start = (yyval.program); }
-#line 1470 "decaf.tab.c" /* yacc.c:1646  */
+#line 1471 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 5:
-#line 123 "decaf.y" /* yacc.c:1646  */
+#line 124 "decaf.y" /* yacc.c:1646  */
     { (yyval.program) = new ASTProgram(string((yyvsp[-2].sval)), NULL, NULL); start = (yyval.program); }
-#line 1476 "decaf.tab.c" /* yacc.c:1646  */
+#line 1477 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 6:
-#line 126 "decaf.y" /* yacc.c:1646  */
+#line 127 "decaf.y" /* yacc.c:1646  */
     { (yyval.field_decls) = new std::vector<ASTFieldDecl *>(); (yyval.field_decls)->push_back((yyvsp[0].field_decl)); }
-#line 1482 "decaf.tab.c" /* yacc.c:1646  */
+#line 1483 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 127 "decaf.y" /* yacc.c:1646  */
+#line 128 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-1].field_decls)->push_back((yyvsp[0].field_decl)); (yyval.field_decls) = (yyvsp[-1].field_decls); }
-#line 1488 "decaf.tab.c" /* yacc.c:1646  */
+#line 1489 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 8:
-#line 130 "decaf.y" /* yacc.c:1646  */
+#line 131 "decaf.y" /* yacc.c:1646  */
     { (yyval.field_decl) = new ASTFieldDecl((yyvsp[-1].identifiers), (yyvsp[-2].type)); }
-#line 1494 "decaf.tab.c" /* yacc.c:1646  */
+#line 1495 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 131 "decaf.y" /* yacc.c:1646  */
+#line 132 "decaf.y" /* yacc.c:1646  */
     { (yyval.field_decl) = new ASTFieldDecl((yyvsp[-1].identifier_arrays), (yyvsp[-2].type)); }
-#line 1500 "decaf.tab.c" /* yacc.c:1646  */
+#line 1501 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 134 "decaf.y" /* yacc.c:1646  */
+#line 135 "decaf.y" /* yacc.c:1646  */
     { (yyval.identifiers) = new std::vector<ASTVarIdentifier *>(); (yyval.identifiers)->push_back(new ASTVarIdentifier(string((yyvsp[0].sval)))); }
-#line 1506 "decaf.tab.c" /* yacc.c:1646  */
+#line 1507 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 135 "decaf.y" /* yacc.c:1646  */
+#line 136 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-2].identifiers)->push_back(new ASTVarIdentifier(string((yyvsp[0].sval)))); (yyval.identifiers) = (yyvsp[-2].identifiers); }
-#line 1512 "decaf.tab.c" /* yacc.c:1646  */
+#line 1513 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 138 "decaf.y" /* yacc.c:1646  */
+#line 139 "decaf.y" /* yacc.c:1646  */
     { (yyval.identifier_arrays) = new std::vector<ASTArrayIdentifier *>(); (yyval.identifier_arrays)->push_back((yyvsp[0].identifier_array)); }
-#line 1518 "decaf.tab.c" /* yacc.c:1646  */
+#line 1519 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 139 "decaf.y" /* yacc.c:1646  */
+#line 140 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-2].identifier_arrays)->push_back((yyvsp[0].identifier_array)); (yyval.identifier_arrays) = (yyvsp[-2].identifier_arrays); }
-#line 1524 "decaf.tab.c" /* yacc.c:1646  */
+#line 1525 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 142 "decaf.y" /* yacc.c:1646  */
+#line 143 "decaf.y" /* yacc.c:1646  */
     { (yyval.identifier_array) = new ASTArrayIdentifier(string((yyvsp[-3].sval)), (yyvsp[-1].ival)); }
-#line 1530 "decaf.tab.c" /* yacc.c:1646  */
+#line 1531 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 145 "decaf.y" /* yacc.c:1646  */
+#line 146 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_decls) = new std::vector<ASTMethodDecl *>(); (yyval.method_decls)->push_back((yyvsp[0].method_decl)); }
-#line 1536 "decaf.tab.c" /* yacc.c:1646  */
+#line 1537 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 146 "decaf.y" /* yacc.c:1646  */
+#line 147 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-1].method_decls)->push_back((yyvsp[0].method_decl)); (yyval.method_decls) = (yyvsp[-1].method_decls); }
-#line 1542 "decaf.tab.c" /* yacc.c:1646  */
+#line 1543 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 149 "decaf.y" /* yacc.c:1646  */
+#line 150 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_decl) = new ASTMethodDecl(string((yyvsp[-4].sval)), (yyvsp[-5].type), (yyvsp[-2].type_identifiers), (yyvsp[0].block)); }
-#line 1548 "decaf.tab.c" /* yacc.c:1646  */
+#line 1549 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 150 "decaf.y" /* yacc.c:1646  */
+#line 151 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_decl) = new ASTMethodDecl(string((yyvsp[-3].sval)), (yyvsp[-4].type), NULL, (yyvsp[0].block)); }
-#line 1554 "decaf.tab.c" /* yacc.c:1646  */
+#line 1555 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 151 "decaf.y" /* yacc.c:1646  */
+#line 152 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_decl) = new ASTMethodDecl(string((yyvsp[-4].sval)), Datatype::void_type, (yyvsp[-2].type_identifiers), (yyvsp[0].block)); }
-#line 1560 "decaf.tab.c" /* yacc.c:1646  */
+#line 1561 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 152 "decaf.y" /* yacc.c:1646  */
+#line 153 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_decl) = new ASTMethodDecl(string((yyvsp[-3].sval)), Datatype::void_type, NULL, (yyvsp[0].block)); }
-#line 1566 "decaf.tab.c" /* yacc.c:1646  */
+#line 1567 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 155 "decaf.y" /* yacc.c:1646  */
+#line 156 "decaf.y" /* yacc.c:1646  */
     { (yyval.type_identifiers) = new std::vector<ASTTypeIdentifier *>(); (yyval.type_identifiers)->push_back((yyvsp[0].type_identifier)); }
-#line 1572 "decaf.tab.c" /* yacc.c:1646  */
+#line 1573 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 156 "decaf.y" /* yacc.c:1646  */
+#line 157 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-2].type_identifiers)->push_back((yyvsp[0].type_identifier)); (yyval.type_identifiers) = (yyvsp[-2].type_identifiers); }
-#line 1578 "decaf.tab.c" /* yacc.c:1646  */
+#line 1579 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 159 "decaf.y" /* yacc.c:1646  */
+#line 160 "decaf.y" /* yacc.c:1646  */
     { (yyval.type_identifier) = new ASTTypeIdentifier(string((yyvsp[0].sval)), (yyvsp[-1].type)); }
-#line 1584 "decaf.tab.c" /* yacc.c:1646  */
+#line 1585 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 162 "decaf.y" /* yacc.c:1646  */
+#line 163 "decaf.y" /* yacc.c:1646  */
     { (yyval.block) = new ASTBlockStatement((yyvsp[-1].statements), (yyvsp[-2].var_decls)); }
-#line 1590 "decaf.tab.c" /* yacc.c:1646  */
+#line 1591 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 163 "decaf.y" /* yacc.c:1646  */
+#line 164 "decaf.y" /* yacc.c:1646  */
     { (yyval.block) = new ASTBlockStatement(NULL, (yyvsp[-1].var_decls)); }
-#line 1596 "decaf.tab.c" /* yacc.c:1646  */
+#line 1597 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 164 "decaf.y" /* yacc.c:1646  */
+#line 165 "decaf.y" /* yacc.c:1646  */
     { (yyval.block) = new ASTBlockStatement((yyvsp[-1].statements), NULL); }
-#line 1602 "decaf.tab.c" /* yacc.c:1646  */
+#line 1603 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 165 "decaf.y" /* yacc.c:1646  */
+#line 166 "decaf.y" /* yacc.c:1646  */
     { (yyval.block) = new ASTBlockStatement(NULL, NULL); }
-#line 1608 "decaf.tab.c" /* yacc.c:1646  */
+#line 1609 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 168 "decaf.y" /* yacc.c:1646  */
+#line 169 "decaf.y" /* yacc.c:1646  */
     { (yyval.statements) = new std::vector<ASTStatement *>(); (yyval.statements)->push_back((yyvsp[0].statement)); }
-#line 1614 "decaf.tab.c" /* yacc.c:1646  */
+#line 1615 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 169 "decaf.y" /* yacc.c:1646  */
+#line 170 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-1].statements)->push_back((yyvsp[0].statement)); (yyval.statements) = (yyvsp[-1].statements); }
-#line 1620 "decaf.tab.c" /* yacc.c:1646  */
+#line 1621 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 30:
-#line 172 "decaf.y" /* yacc.c:1646  */
+#line 173 "decaf.y" /* yacc.c:1646  */
     { (yyval.var_decls) = new std::vector<ASTVarDecl *>(); (yyval.var_decls)->push_back((yyvsp[0].var_decl)); }
-#line 1626 "decaf.tab.c" /* yacc.c:1646  */
+#line 1627 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 31:
-#line 173 "decaf.y" /* yacc.c:1646  */
+#line 174 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-1].var_decls)->push_back((yyvsp[0].var_decl)); (yyval.var_decls) = (yyvsp[-1].var_decls); }
-#line 1632 "decaf.tab.c" /* yacc.c:1646  */
+#line 1633 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 32:
-#line 176 "decaf.y" /* yacc.c:1646  */
+#line 177 "decaf.y" /* yacc.c:1646  */
     { (yyval.var_decl) = new ASTVarDecl((yyvsp[-1].identifiers), (yyvsp[-2].type)); }
-#line 1638 "decaf.tab.c" /* yacc.c:1646  */
+#line 1639 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 33:
-#line 179 "decaf.y" /* yacc.c:1646  */
+#line 180 "decaf.y" /* yacc.c:1646  */
     { (yyval.type) = Datatype::int_type; }
-#line 1644 "decaf.tab.c" /* yacc.c:1646  */
+#line 1645 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 34:
-#line 180 "decaf.y" /* yacc.c:1646  */
+#line 181 "decaf.y" /* yacc.c:1646  */
     { (yyval.type) = Datatype::bool_type; }
-#line 1650 "decaf.tab.c" /* yacc.c:1646  */
+#line 1651 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 183 "decaf.y" /* yacc.c:1646  */
+#line 184 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = NULL; }
-#line 1656 "decaf.tab.c" /* yacc.c:1646  */
+#line 1657 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 36:
-#line 184 "decaf.y" /* yacc.c:1646  */
+#line 185 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTAssignmentStatement((yyvsp[-2].assign_op), (yyvsp[-3].location), (yyvsp[-1].expr)); }
-#line 1662 "decaf.tab.c" /* yacc.c:1646  */
+#line 1663 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 37:
-#line 185 "decaf.y" /* yacc.c:1646  */
+#line 186 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = (yyvsp[-1].method_call); }
-#line 1668 "decaf.tab.c" /* yacc.c:1646  */
+#line 1669 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 38:
-#line 186 "decaf.y" /* yacc.c:1646  */
+#line 187 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTIfStatement((yyvsp[-4].expr), (yyvsp[-2].block), (yyvsp[0].block)); }
-#line 1674 "decaf.tab.c" /* yacc.c:1646  */
+#line 1675 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 39:
-#line 187 "decaf.y" /* yacc.c:1646  */
+#line 188 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTIfStatement((yyvsp[-2].expr), (yyvsp[0].block), NULL); }
-#line 1680 "decaf.tab.c" /* yacc.c:1646  */
+#line 1681 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 40:
-#line 188 "decaf.y" /* yacc.c:1646  */
+#line 189 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTForStatement((yyvsp[-3].expr), (yyvsp[-1].expr), (yyvsp[0].block), string((yyvsp[-5].sval))); }
-#line 1686 "decaf.tab.c" /* yacc.c:1646  */
+#line 1687 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 189 "decaf.y" /* yacc.c:1646  */
+#line 190 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTReturnStatement((yyvsp[-1].expr)); }
-#line 1692 "decaf.tab.c" /* yacc.c:1646  */
+#line 1693 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 190 "decaf.y" /* yacc.c:1646  */
+#line 191 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTReturnStatement(NULL); }
-#line 1698 "decaf.tab.c" /* yacc.c:1646  */
+#line 1699 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 191 "decaf.y" /* yacc.c:1646  */
+#line 192 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTBreakStatement(); }
-#line 1704 "decaf.tab.c" /* yacc.c:1646  */
+#line 1705 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 44:
-#line 192 "decaf.y" /* yacc.c:1646  */
+#line 193 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = new ASTContinueStatement(); }
-#line 1710 "decaf.tab.c" /* yacc.c:1646  */
+#line 1711 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 193 "decaf.y" /* yacc.c:1646  */
+#line 194 "decaf.y" /* yacc.c:1646  */
     { (yyval.statement) = (yyvsp[0].block); }
-#line 1716 "decaf.tab.c" /* yacc.c:1646  */
+#line 1717 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 196 "decaf.y" /* yacc.c:1646  */
+#line 197 "decaf.y" /* yacc.c:1646  */
     { (yyval.assign_op) = AssignOp::equal; }
-#line 1722 "decaf.tab.c" /* yacc.c:1646  */
+#line 1723 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 197 "decaf.y" /* yacc.c:1646  */
+#line 198 "decaf.y" /* yacc.c:1646  */
     { (yyval.assign_op) = AssignOp::plus_equal; }
-#line 1728 "decaf.tab.c" /* yacc.c:1646  */
+#line 1729 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 48:
-#line 198 "decaf.y" /* yacc.c:1646  */
+#line 199 "decaf.y" /* yacc.c:1646  */
     { (yyval.assign_op) = AssignOp::minus_equal; }
-#line 1734 "decaf.tab.c" /* yacc.c:1646  */
+#line 1735 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 49:
-#line 201 "decaf.y" /* yacc.c:1646  */
+#line 202 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_call) = new ASTNormalMethod(string((yyvsp[-3].sval)), (yyvsp[-1].exprs)); }
-#line 1740 "decaf.tab.c" /* yacc.c:1646  */
+#line 1741 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 50:
-#line 202 "decaf.y" /* yacc.c:1646  */
+#line 203 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_call) = new ASTNormalMethod(string((yyvsp[-2].sval)), NULL); }
-#line 1746 "decaf.tab.c" /* yacc.c:1646  */
+#line 1747 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 51:
-#line 203 "decaf.y" /* yacc.c:1646  */
+#line 204 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_call) = new ASTCalloutMethod(string((yyvsp[-3].sval)), (yyvsp[-1].callout_args)); }
-#line 1752 "decaf.tab.c" /* yacc.c:1646  */
+#line 1753 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 52:
-#line 204 "decaf.y" /* yacc.c:1646  */
+#line 205 "decaf.y" /* yacc.c:1646  */
     { (yyval.method_call) = new ASTCalloutMethod(string((yyvsp[-1].sval)), NULL); }
-#line 1758 "decaf.tab.c" /* yacc.c:1646  */
+#line 1759 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 53:
-#line 207 "decaf.y" /* yacc.c:1646  */
+#line 208 "decaf.y" /* yacc.c:1646  */
     { (yyval.exprs) = new std::vector<ASTExpression *>(); (yyval.exprs)->push_back((yyvsp[0].expr)); }
-#line 1764 "decaf.tab.c" /* yacc.c:1646  */
+#line 1765 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 54:
-#line 208 "decaf.y" /* yacc.c:1646  */
+#line 209 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-2].exprs)->push_back((yyvsp[0].expr)); (yyval.exprs) = (yyvsp[-2].exprs); }
-#line 1770 "decaf.tab.c" /* yacc.c:1646  */
+#line 1771 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 55:
-#line 211 "decaf.y" /* yacc.c:1646  */
+#line 212 "decaf.y" /* yacc.c:1646  */
     { (yyval.callout_args) = new std::vector<ASTCalloutArg *>(); (yyval.callout_args)->push_back((yyvsp[0].callout_arg)); }
-#line 1776 "decaf.tab.c" /* yacc.c:1646  */
+#line 1777 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 56:
-#line 212 "decaf.y" /* yacc.c:1646  */
+#line 213 "decaf.y" /* yacc.c:1646  */
     { (yyvsp[-2].callout_args)->push_back((yyvsp[0].callout_arg)); (yyval.callout_args) = (yyvsp[-2].callout_args); }
-#line 1782 "decaf.tab.c" /* yacc.c:1646  */
+#line 1783 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 215 "decaf.y" /* yacc.c:1646  */
+#line 216 "decaf.y" /* yacc.c:1646  */
     { (yyval.location) = new ASTVarLocation(string((yyvsp[0].sval))); }
-#line 1788 "decaf.tab.c" /* yacc.c:1646  */
+#line 1789 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 216 "decaf.y" /* yacc.c:1646  */
+#line 217 "decaf.y" /* yacc.c:1646  */
     { (yyval.location) = new ASTArrayLocation(string((yyvsp[-3].sval)), (yyvsp[-1].expr)); }
-#line 1794 "decaf.tab.c" /* yacc.c:1646  */
+#line 1795 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 59:
-#line 219 "decaf.y" /* yacc.c:1646  */
+#line 220 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = (yyvsp[0].location); }
-#line 1800 "decaf.tab.c" /* yacc.c:1646  */
+#line 1801 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 60:
-#line 220 "decaf.y" /* yacc.c:1646  */
+#line 221 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = (yyvsp[0].method_call); }
-#line 1806 "decaf.tab.c" /* yacc.c:1646  */
+#line 1807 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 61:
-#line 221 "decaf.y" /* yacc.c:1646  */
+#line 222 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = (yyvsp[0].literal); }
-#line 1812 "decaf.tab.c" /* yacc.c:1646  */
+#line 1813 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 62:
-#line 222 "decaf.y" /* yacc.c:1646  */
+#line 223 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::or_op); }
-#line 1818 "decaf.tab.c" /* yacc.c:1646  */
+#line 1819 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 63:
-#line 223 "decaf.y" /* yacc.c:1646  */
+#line 224 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::and_op); }
-#line 1824 "decaf.tab.c" /* yacc.c:1646  */
+#line 1825 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 64:
-#line 224 "decaf.y" /* yacc.c:1646  */
+#line 225 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::equalequal_op); }
-#line 1830 "decaf.tab.c" /* yacc.c:1646  */
+#line 1831 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 65:
-#line 225 "decaf.y" /* yacc.c:1646  */
+#line 226 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::notequal_op); }
-#line 1836 "decaf.tab.c" /* yacc.c:1646  */
+#line 1837 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 66:
-#line 226 "decaf.y" /* yacc.c:1646  */
+#line 227 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::lessthan_op); }
-#line 1842 "decaf.tab.c" /* yacc.c:1646  */
+#line 1843 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 67:
-#line 227 "decaf.y" /* yacc.c:1646  */
+#line 228 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::lessequal_op); }
-#line 1848 "decaf.tab.c" /* yacc.c:1646  */
+#line 1849 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 68:
-#line 228 "decaf.y" /* yacc.c:1646  */
+#line 229 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::greaterequal_op); }
-#line 1854 "decaf.tab.c" /* yacc.c:1646  */
+#line 1855 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 69:
-#line 229 "decaf.y" /* yacc.c:1646  */
+#line 230 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::greaterthan_op); }
-#line 1860 "decaf.tab.c" /* yacc.c:1646  */
+#line 1861 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 70:
-#line 230 "decaf.y" /* yacc.c:1646  */
+#line 231 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::plus_op); }
-#line 1866 "decaf.tab.c" /* yacc.c:1646  */
+#line 1867 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 71:
-#line 231 "decaf.y" /* yacc.c:1646  */
+#line 232 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::minus_op); }
-#line 1872 "decaf.tab.c" /* yacc.c:1646  */
+#line 1873 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 72:
-#line 232 "decaf.y" /* yacc.c:1646  */
+#line 233 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::multiply_op); }
-#line 1878 "decaf.tab.c" /* yacc.c:1646  */
+#line 1879 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 73:
-#line 233 "decaf.y" /* yacc.c:1646  */
+#line 234 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::divide_op); }
-#line 1884 "decaf.tab.c" /* yacc.c:1646  */
+#line 1885 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 74:
-#line 234 "decaf.y" /* yacc.c:1646  */
+#line 235 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTBinaryOperationExpression((yyvsp[-2].expr), (yyvsp[0].expr), BinOp::modulo_op); }
-#line 1890 "decaf.tab.c" /* yacc.c:1646  */
+#line 1891 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 75:
-#line 235 "decaf.y" /* yacc.c:1646  */
+#line 236 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTUnaryOperationExpression((yyvsp[0].expr), UnOp::not_op); }
-#line 1896 "decaf.tab.c" /* yacc.c:1646  */
+#line 1897 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 76:
-#line 236 "decaf.y" /* yacc.c:1646  */
+#line 237 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = new ASTUnaryOperationExpression((yyvsp[0].expr), UnOp::minus_op); }
-#line 1902 "decaf.tab.c" /* yacc.c:1646  */
+#line 1903 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 77:
-#line 237 "decaf.y" /* yacc.c:1646  */
+#line 238 "decaf.y" /* yacc.c:1646  */
     { (yyval.expr) = (yyvsp[-1].expr); }
-#line 1908 "decaf.tab.c" /* yacc.c:1646  */
+#line 1909 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 78:
-#line 240 "decaf.y" /* yacc.c:1646  */
+#line 241 "decaf.y" /* yacc.c:1646  */
     { (yyval.callout_arg) = new ASTExpressionCalloutArg((yyvsp[0].expr)); }
-#line 1914 "decaf.tab.c" /* yacc.c:1646  */
+#line 1915 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 79:
-#line 241 "decaf.y" /* yacc.c:1646  */
+#line 242 "decaf.y" /* yacc.c:1646  */
     { (yyval.callout_arg) = new ASTStringCalloutArg(string((yyvsp[0].sval))); }
-#line 1920 "decaf.tab.c" /* yacc.c:1646  */
+#line 1921 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 80:
-#line 244 "decaf.y" /* yacc.c:1646  */
+#line 245 "decaf.y" /* yacc.c:1646  */
     { (yyval.literal) = new ASTIntegerLiteralExpression((yyvsp[0].ival)); }
-#line 1926 "decaf.tab.c" /* yacc.c:1646  */
+#line 1927 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 81:
-#line 245 "decaf.y" /* yacc.c:1646  */
+#line 246 "decaf.y" /* yacc.c:1646  */
     { (yyval.literal) = new ASTCharLiteralExpression((yyvsp[0].cval)); }
-#line 1932 "decaf.tab.c" /* yacc.c:1646  */
+#line 1933 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 82:
-#line 246 "decaf.y" /* yacc.c:1646  */
+#line 247 "decaf.y" /* yacc.c:1646  */
     { (yyval.literal) = new ASTTrueLiteralExpression(); }
-#line 1938 "decaf.tab.c" /* yacc.c:1646  */
+#line 1939 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
   case 83:
-#line 247 "decaf.y" /* yacc.c:1646  */
+#line 248 "decaf.y" /* yacc.c:1646  */
     { (yyval.literal) = new ASTFalseLiteralExpression(); }
-#line 1944 "decaf.tab.c" /* yacc.c:1646  */
+#line 1945 "decaf.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1948 "decaf.tab.c" /* yacc.c:1646  */
+#line 1949 "decaf.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2172,7 +2173,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 251 "decaf.y" /* yacc.c:1906  */
+#line 252 "decaf.y" /* yacc.c:1906  */
 
 
 int main( int argc, char *argv[]) {
