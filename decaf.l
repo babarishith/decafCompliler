@@ -26,8 +26,8 @@ char ([\40-\176]{-}['"\\])|\\n|\\t|\\\\|\\\"|\\\'
 ";"					{return ';'; }
 ","					{return ','; }
 "."					{return '.'; }
-[0-9]+				{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUMBER; }
-0x{hex}+			{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUMBER; }
+[0-9]+				{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUM; }
+0x{hex}+			{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUM; }
 class				{ yylval.sval = strdup(yytext); outflex << "CLASS" << endl ; return CLASS; }
 "\"{char}*\""		{ yylval.sval = strdup(yytext); outflex << "CLASS" << endl ; return STRING; } 
 "\'{char}\'"		{ yylval.sval = strdup(yytext[1]); outflex << "CLASS" << endl ; return CHAR; } 
@@ -60,14 +60,17 @@ while				{ yylval.sval = strdup(yytext); outflex << "WHILE" << endl; return WHIL
 "*"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return MUL; }
 "/"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return DIV; }
 "!"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return NOT; }
-"!="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return NOTEQ; }
-"<="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return LE; }
+"!="				{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return NE; }
+"<="				{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return LE; }
 "<"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return LT; }
 ">"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return GT; }
-">="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return GE; }
-"=="					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return EE; }
-"{" 					{outflex << "OPENB" << endl; return OPENB ;}
-"}" 					{ outflex << "CLOSEB" << endl;return CLOSEB ;}
-"(" 					{ outflex << "OPENC" << endl; return OPENC ;}
-")" 					{ outflex << "CLOSEC" << endl; return CLOSEC ;}
+">="				{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return GE; }
+"=="				{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return EE; }
+"%"					{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return MOD; }
+"||"				{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return OR; }
+"&&"				{ yylval.sval = strdup(yytext);outflex << "SUM_OP:" << yytext << endl; return AND; }
+"{" 				{outflex << "OPENB" << endl; return OPENB ;}
+"}" 				{ outflex << "CLOSEB" << endl;return CLOSEB ;}
+"(" 				{ outflex << "OPENC" << endl; return OPENC ;}
+")" 				{ outflex << "CLOSEC" << endl; return CLOSEC ;}
 %%	
