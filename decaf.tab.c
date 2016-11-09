@@ -2191,6 +2191,8 @@ int main( int argc, char *argv[]) {
 	} while (!feof(yyin));
 
 	cout << "Success" << endl;
+	PrintVisitor v;
+	start->accept(&v);
 	outflex.close();
 	outfile.close();
 }

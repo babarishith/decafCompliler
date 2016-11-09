@@ -31,8 +31,8 @@ char ([\40-\176]{-}['"\\])|\\n|\\t|\\\\|\\\"|\\\'
 [0-9]+				{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUM; }
 0x{hex}+			{ yylval.ival = atoi(yytext); outflex << "INT:" << yytext << endl ; return NUM; }
 class				{ yylval.sval = strdup(yytext); outflex << "CLASS" << endl ; return CLASS; }
-"\"{char}*\""		{ yylval.sval = strdup(yytext); outflex << "CLASS" << endl ; return STRING; } 
-"\'{char}\'"		{ yylval.cval = yytext[1]; outflex << "CLASS" << endl ; return CHAR; } 
+\"{char}*\"			{ yylval.sval = strdup(yytext); outflex << "CLASS" << endl ; return STRING; } 
+\'{char}\'		{ yylval.cval = yytext[1]; outflex << "CLASS" << endl ; return CHAR; } 
 int					{ yylval.sval = strdup(yytext);outflex << "INT_DECLARATOIN" << endl ; return INT; }
 void				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return VOID; }
 boolean				{ yylval.sval = strdup(yytext); outflex << "VOID_DECLARATOIN"  << endl ; return BOOL; }
