@@ -818,33 +818,33 @@ class PrintVisitor : public Visitor
 {
 public:
     void visit(ASTProgram * node) {
-        // outfile<<"<program>"<<std::endl;
+        outfile<<"<program>"<<std::endl;
         if(node->getFdl() == NULL){
-            // outfile<<"<field_declarations count = \"0\">"<<std::endl;
+            outfile<<"<field_declarations count = \"0\">"<<std::endl;
         }
 
         else{
-            // outfile<<"<field_declarations count =\" "<<(node->getFdl())->size()<<"\">"<<std::endl;
+            outfile<<"<field_declarations count =\" "<<(node->getFdl())->size()<<"\">"<<std::endl;
             for(auto it = (node->getFdl())->begin() ; it != (node->getFdl())->end(); it++) {
                 (*it)->accept(this);
             }               
         }
-        // outfile<<"</field_declarations>"<<std::endl;
+        outfile<<"</field_declarations>"<<std::endl;
         if(node->getMdl() == NULL){
-            // outfile<<"<method_declarations count = \"0\">"<<std::endl;
+            outfile<<"<method_declarations count = \"0\">"<<std::endl;
         }
 
         else{
-            // outfile<<"<method_declarations count =\" "<<(node->getMdl())->size()<<"\">"<<std::endl;
+            outfile<<"<method_declarations count =\" "<<(node->getMdl())->size()<<"\">"<<std::endl;
             for(auto it = (node->getMdl())->begin() ; it != (node->getMdl())->end(); it++) {
                 (*it)->accept(this);
             }               
         }
-        // outfile<<"</method_declarations>"<<std::endl;
-        // outfile<<"</program>"<<std::endl;
+        outfile<<"</method_declarations>"<<std::endl;
+        outfile<<"</program>"<<std::endl;
     }
     void visit(ASTFieldDecl * node) {
-        outfile<<node->parseDatatype(node->getType())<<" ";
+        outfile<< "<declarations type=" << node->parseDatatype(node->getType())<<">"<<std::endl;
         if (node->getVar_id_list()) {
             for(auto it = (node->getVar_id_list())->begin() ; it != (node->getVar_id_list())->end(); it++) {
                 (*it)->accept(this);
@@ -855,14 +855,15 @@ public:
                 (*it)->accept(this);
             }
         }
+        outfile << "</declarations>"<<std::endl;
     }
 
     void visit(ASTVarIdentifier * node) {
-        outfile<<" "<<node->getId();
+        outfile<<"<name="<<node->getId() << "/>"<<std::endl;
     }
 
     void visit(ASTArrayIdentifier * node) {
-        outfile<<" "<<node->getId()<<"["<<node->getSize()<<"]";
+        outfile<<"<name="<<node->getId()<<" size="<<node->getSize()<<" />"<<std::endl;
     }
 
     void visit(ASTMethodDecl * node) {
@@ -883,7 +884,7 @@ public:
 
     void visit(ASTBlockStatement * node) {
         outfile<<"{"<<std::endl;
-        // outfile<<"no of statements = ";
+        outfile<<"no of statements = ";
         if(node->getStmtlist() && node->getId_list()){
             outfile<<node->getStmtlist()->size() + node->getId_list()->size()<<std::endl;
         for(auto it = (node->getId_list())->begin() ; it != (node->getId_list())->end(); it++) {
@@ -930,13 +931,13 @@ public:
         outfile<<")";
     }
     void visit(ASTCalloutMethod * node) {
-        outfile<<node->getMethod_name()<<"(";
+        outfile<<"<callout function=\""<<node->getMethod_name()<<"\">";
         if(node->getArguments()){
             for(auto it = (node->getArguments())->begin() ; it != (node->getArguments())->end(); it++) {
               (*it)->accept(this);
             }
         }
-        outfile<<")"<<std::endl;
+        outfile<<"</callout>"<<std::endl;
     }
     void visit(ASTCalloutArg * node) {
         
@@ -984,21 +985,22 @@ public:
         outfile<<""<<std::endl;
     }
     void visit(ASTIntegerLiteralExpression * node) {
-        outfile<<" "<<node->getValue();
+        outfile<<"<integer value="<<node->getValue()<<" />"<<std::endl;
     }
     void visit(ASTCharLiteralExpression * node) {
-        outfile<<" "<<node->getValue();
+        outfile<<"<character value="<<node->getValue()<<" />"<<std::endl;
     }
     void visit(ASTTrueLiteralExpression * node) {
-        outfile<<" "<<node->getValue();
+        outfile<<"<boolean value="<<node->getValue()<<" />"<<std::endl;
     }
     void visit(ASTFalseLiteralExpression * node) {
-        outfile<<" "<<node->getValue();
+        outfile<<"<boolean value="<<node->getValue()<<" />"<<std::endl;
     }
     void visit(ASTBinaryOperationExpression * node) {
+    	outfile<<"<binary_expression type=\"" <<node->parseBinOp(node->getOp())<< "\">";
         node->getLeft()->accept(this);
-        outfile<<" "<<node->parseBinOp(node->getOp())<<" ";
         node->getRight()->accept(this);
+        outfile<<"</binary_expression>";
     }
     void visit(ASTUnaryOperationExpression * node) {
         outfile<<node->parseUnOp(node->getOp())<<" "<<std::endl;

@@ -1,29 +1,50 @@
-int  a[10]int main (int x1 )
+<program>
+<field_declarations count =" 1">
+<declarations type=int>
+<name=a size=10 />
+</declarations>
+</field_declarations>
+<method_declarations count =" 1">
+int main (int x1 )
 {
-4
-int  i
-a [0x13c2700] =  1
-return  0 0 2{
-3
-int  j
- 0 2{
-2
-if(j  %  2 ==  0)
+no of statements = 4
+int <name=i/>
+
+a [0x1b58700] = <integer value=1 />
+
+return <integer value=0 />
+<integer value=0 />
+<integer value=2 />
 {
-1
-"printf"("y  ")
+no of statements = 3
+int <name=j/>
+
+<integer value=0 />
+<integer value=2 />
+{
+no of statements = 2
+if(<binary_expression type="=="><binary_expression type="%">j <integer value=2 />
+</binary_expression><integer value=0 />
+</binary_expression>)
+{
+no of statements = 1
+<callout function=""printf"">"y  "</callout>
 
 }
 {
-1
-"printf"("n  ")
+no of statements = 1
+<callout function=""printf"">"n  "</callout>
 
 }
-j  +=  1
+j  += <integer value=1 />
+
 
 }
-i  +=  1
+i  += <integer value=1 />
+
 
 }
 
 }
+</method_declarations>
+</program>
