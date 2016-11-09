@@ -45,28 +45,45 @@ extern int yydebug;
 # define YYTOKENTYPE
   enum yytokentype
   {
-    NUMBER = 258,
-    ID = 259,
-    ADDOP = 260,
-    MULOP = 261,
-    RELOP = 262,
-    UNARYOP = 263,
-    INT = 264,
-    VOID = 265,
-    IF = 266,
+    OPENC = 258,
+    CLOSEC = 259,
+    OPENB = 260,
+    CLOSEB = 261,
+    BOOL = 262,
+    BREAK = 263,
+    CALLOUT = 264,
+    CLASS = 265,
+    CONTINUE = 266,
     ELSE = 267,
-    NEW = 268,
-    NUL = 269,
-    READ = 270,
-    PRINT = 271,
-    THIS = 272,
-    WHILE = 273,
-    RETURN = 274,
-    CLASS = 275,
-    OPENB = 276,
-    CLOSEB = 277,
-    OPENC = 278,
-    CLOSEC = 279
+    FALSE = 268,
+    FOR = 269,
+    IF = 270,
+    INT = 271,
+    RETURN = 272,
+    TRUE = 273,
+    VOID = 274,
+    OR = 275,
+    AND = 276,
+    EQ = 277,
+    PE = 278,
+    ME = 279,
+    EE = 280,
+    NE = 281,
+    LE = 282,
+    LT = 283,
+    GE = 284,
+    GT = 285,
+    PLUS = 286,
+    MINUS = 287,
+    MUL = 288,
+    DIV = 289,
+    MOD = 290,
+    NOT = 291,
+    UMINUS = 292,
+    ID = 293,
+    NUM = 294,
+    STRING = 295,
+    CHAR = 296
   };
 #endif
 
@@ -75,13 +92,37 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 21 "decaf.y" /* yacc.c:1909  */
+#line 26 "decaf.y" /* yacc.c:1909  */
 
-	int ival;
-	float fval;
 	char *sval;
+	int ival;
+	char cval;
+	ASTProgram * program;
+	std::vector<ASTFieldDecl *> * field_decls;
+	ASTFieldDecl * field_decl;
+	std::vector<ASTVarIdentifier *> * identifiers;
+	std::vector<ASTArrayIdentifier *> * identifier_arrays;
+	ASTArrayIdentifier * identifier_array;
+	std::vector<ASTMethodDecl *> * method_decls;
+	ASTMethodDecl * method_decl;
+	std::vector<ASTTypeIdentifier *> * type_identifiers;
+	ASTTypeIdentifier * type_identifier;
+	ASTBlockStatement * block;
+	std::vector<ASTStatement *> * statements;
+	std::vector<ASTVarDecl *> * var_decls;
+	ASTVarDecl * var_decl;
+	Datatype type;
+	ASTStatement * statement;
+	AssignOp assign_op;
+	ASTMethodCall * method_call;
+	std::vector<ASTExpression *> * exprs;
+	std::vector<ASTCalloutArg *> * callout_args;
+	ASTLocation * location;
+	ASTExpression * expr;
+	ASTCalloutArg * callout_arg;
+	ASTLiteralExpression * literal;
 
-#line 85 "decaf.tab.h" /* yacc.c:1909  */
+#line 126 "decaf.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
