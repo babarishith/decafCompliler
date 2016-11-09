@@ -1,1736 +1,2492 @@
-State 17 conflicts: 1 shift/reduce
-State 43 conflicts: 1 shift/reduce
-State 105 conflicts: 7 shift/reduce
-
-
 Grammar
 
-    0 $accept: Program $end
+    0 $accept: program $end
 
-    1 Program: Class_Declarations
+    1 program: CLASS ID OPENB field_decls method_decls CLOSEB
+    2        | CLASS ID OPENB field_decls CLOSEB
+    3        | CLASS ID OPENB method_decls CLOSEB
+    4        | CLASS ID OPENB CLOSEB
 
-    2 Class_Declarations: Class_Declarations Class_Declaration
-    3                   | Class_Declaration
+    5 field_decls: field_decl
+    6            | field_decls field_decl
 
-    4 Class_Declaration: CLASS ID Class_Body
+    7 field_decl: type identifiers ';'
+    8           | type identifier_arrays ';'
 
-    5 Class_Body: OPENB CLOSEB
-    6           | OPENB Var_Declarations CLOSEB
-    7           | OPENB Method_Declarations CLOSEB
-    8           | OPENB Var_Declarations Method_Declarations CLOSEB
+    9 identifiers: ID
+   10            | identifiers ',' ID
 
-    9 Var_Declarations: Var_Declarations Var_Declaration
-   10                 | Var_Declaration
+   11 identifier_arrays: identifier_array
+   12                  | identifier_arrays ',' identifier_array
 
-   11 Method_Declarations: Method_Declarations Method_Declaration
-   12                    | Method_Declaration
+   13 identifier_array: ID '[' NUM ']'
 
-   13 Var_Declaration: Type ID ';'
+   14 method_decls: method_decl
+   15             | method_decls method_decl
 
-   14 Type: Simple_Type
-   15     | Simple_Type '[' ']'
+   16 method_decl: type ID OPENC type_identifiers CLOSEC block
+   17            | type ID OPENC CLOSEC block
+   18            | VOID ID OPENC type_identifiers CLOSEC block
+   19            | VOID ID OPENC CLOSEC block
 
-   16 Simple_Type: INT
-   17            | ID
+   20 type_identifiers: type_identifier
+   21                 | type_identifiers ',' type_identifier
 
-   18 Method_Declaration: Result_Type ID OPENC Parameter_List CLOSEC Method_Body
+   22 type_identifier: type ID
 
-   19 Result_Type: Type
-   20            | VOID
+   23 block: OPENB var_decls statements CLOSEB
+   24      | OPENB var_decls CLOSEB
+   25      | OPENB statements CLOSEB
+   26      | OPENB CLOSEB
 
-   21 Parameter_List: %empty
-   22               | Parameter_List ',' Parameter
-   23               | Parameter
+   27 statements: statement
+   28           | statements statement
 
-   24 Parameter: Type ID
+   29 var_decls: var_decl
+   30          | var_decls var_decl
 
-   25 Local_Var_Declarations: Local_Var_Declarations Local_Var_Declaration
-   26                       | Local_Var_Declaration
+   31 var_decl: type identifiers ';'
 
-   27 Simple_Statements: Simple_Statements Simple_Statement
-   28                  | Simple_Statement
+   32 type: INT
+   33     | BOOL
 
-   29 Method_Body: OPENB CLOSEB
-   30            | OPENB Local_Var_Declarations CLOSEB
-   31            | OPENB Simple_Statements CLOSEB
-   32            | OPENB Local_Var_Declarations Simple_Statements CLOSEB
+   34 statement: ';'
+   35          | location assign_op expr ';'
+   36          | method_call ';'
+   37          | IF OPENC expr CLOSEC block ELSE block
+   38          | IF OPENC expr CLOSEC block
+   39          | FOR ID EQ expr ',' expr block
+   40          | RETURN expr ';'
+   41          | RETURN ';'
+   42          | BREAK ';'
+   43          | CONTINUE ';'
+   44          | block
 
-   33 Local_Var_Declaration: Type ID ';'
+   45 assign_op: EQ
+   46          | PE
+   47          | ME
 
-   34 Statement: Simple_Statement
-   35          | OPENB Simple_Statements CLOSEB
+   48 method_call: ID OPENC exprs CLOSEC
+   49            | ID OPENC CLOSEC
+   50            | CALLOUT OPENC STRING ',' callout_args CLOSEC
+   51            | CALLOUT OPENC STRING CLOSEC
 
-   36 Simple_Statement: ';'
-   37                 | Name '=' Expression ';'
-   38                 | Name OPENC Arg_List CLOSEC ';'
-   39                 | PRINT OPENC Arg_List CLOSEC ';'
-   40                 | Conditional_Statement
-   41                 | WHILE OPENC Expression CLOSEC Statement
-   42                 | RETURN Optional_Expression ';'
+   52 exprs: expr
+   53      | exprs ',' expr
 
-   43 Name: Variable_Access
-   44     | Variable_Access '.' Field_Access
+   54 callout_args: callout_arg
+   55             | callout_args ',' callout_arg
 
-   45 Variable_Access: THIS
-   46                | ID
-   47                | ID '[' Expression ']'
+   56 location: ID
+   57         | ID '[' expr ']'
 
-   48 Field_Access: ID
-   49             | ID '[' Expression ']'
+   58 expr: location
+   59     | method_call
+   60     | literal
+   61     | expr OR expr
+   62     | expr AND expr
+   63     | expr EE expr
+   64     | expr NE expr
+   65     | expr LT expr
+   66     | expr LE expr
+   67     | expr GE expr
+   68     | expr GT expr
+   69     | expr PLUS expr
+   70     | expr MINUS expr
+   71     | expr MUL expr
+   72     | expr DIV expr
+   73     | expr MOD expr
+   74     | NOT expr
+   75     | MINUS expr
+   76     | OPENC expr CLOSEC
 
-   50 Arg_List: %empty
-   51         | Arg_List ',' Expression
-   52         | Expression
+   77 callout_arg: expr
+   78            | STRING
 
-   53 Conditional_Statement: IF OPENC Expression CLOSEC
-   54                      | IF OPENC Expression CLOSEC Statement ELSE Statement
-
-   55 Optional_Expression: %empty
-   56                    | Expression
-
-   57 Expression: Name
-   58           | NUMBER
-   59           | NUL
-   60           | Name OPENC Arg_List CLOSEC
-   61           | READ OPENC CLOSEC
-   62           | New_Expression
-   63           | UNARYOP Expression
-   64           | Expression RELOP Expression
-   65           | Expression ADDOP Expression
-   66           | Expression MULOP Expression
-   67           | OPENC Expression CLOSEC
-
-   68 New_Expression: NEW ID OPENC CLOSEC
-   69               | NEW INT '[' Expression ']'
-   70               | NEW ID '[' Expression ']'
+   79 literal: NUM
+   80        | CHAR
+   81        | TRUE
+   82        | FALSE
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
-',' (44) 22 51
-'.' (46) 44
-';' (59) 13 33 36 37 38 39 42
-'=' (61) 37
-'[' (91) 15 47 49 69 70
-']' (93) 15 47 49 69 70
+',' (44) 10 12 21 39 50 53 55
+';' (59) 7 8 31 34 35 36 40 41 42 43
+'[' (91) 13 57
+']' (93) 13 57
 error (256)
-NUMBER (258) 58
-ID (259) 4 13 17 18 24 33 46 47 48 49 68 70
-ADDOP (260) 65
-MULOP (261) 66
-RELOP (262) 64
-UNARYOP (263) 63
-INT (264) 16 69
-VOID (265) 20
-IF (266) 53 54
-ELSE (267) 54
-NEW (268) 68 69 70
-NUL (269) 59
-READ (270) 61
-PRINT (271) 39
-THIS (272) 45
-WHILE (273) 41
-RETURN (274) 42
-CLASS (275) 4
-OPENB (276) 5 6 7 8 29 30 31 32 35
-CLOSEB (277) 5 6 7 8 29 30 31 32 35
-OPENC (278) 18 38 39 41 53 54 60 61 67 68
-CLOSEC (279) 18 38 39 41 53 54 60 61 67 68
+OPENC (258) 16 17 18 19 37 38 48 49 50 51 76
+CLOSEC (259) 16 17 18 19 37 38 48 49 50 51 76
+OPENB (260) 1 2 3 4 23 24 25 26
+CLOSEB (261) 1 2 3 4 23 24 25 26
+BOOL (262) 33
+BREAK (263) 42
+CALLOUT (264) 50 51
+CLASS (265) 1 2 3 4
+CONTINUE (266) 43
+ELSE (267) 37
+FALSE (268) 82
+FOR (269) 39
+IF (270) 37 38
+INT (271) 32
+RETURN (272) 40 41
+TRUE (273) 81
+VOID (274) 18 19
+OR (275) 61
+AND (276) 62
+EQ (277) 39 45
+PE (278) 46
+ME (279) 47
+EE (280) 63
+NE (281) 64
+LE (282) 66
+LT (283) 65
+GE (284) 67
+GT (285) 68
+PLUS (286) 69
+MINUS (287) 70 75
+MUL (288) 71
+DIV (289) 72
+MOD (290) 73
+NOT (291) 74
+UMINUS (292)
+ID (293) 1 2 3 4 9 10 13 16 17 18 19 22 39 48 49 56 57
+NUM (294) 13 79
+STRING (295) 50 51 78
+CHAR (296) 80
 
 
 Nonterminals, with rules where they appear
 
-$accept (31)
+$accept (46)
     on left: 0
-Program (32)
-    on left: 1, on right: 0
-Class_Declarations (33)
-    on left: 2 3, on right: 1 2
-Class_Declaration (34)
-    on left: 4, on right: 2 3
-Class_Body (35)
-    on left: 5 6 7 8, on right: 4
-Var_Declarations (36)
-    on left: 9 10, on right: 6 8 9
-Method_Declarations (37)
-    on left: 11 12, on right: 7 8 11
-Var_Declaration (38)
-    on left: 13, on right: 9 10
-Type (39)
-    on left: 14 15, on right: 13 19 24 33
-Simple_Type (40)
-    on left: 16 17, on right: 14 15
-Method_Declaration (41)
-    on left: 18, on right: 11 12
-Result_Type (42)
-    on left: 19 20, on right: 18
-Parameter_List (43)
-    on left: 21 22 23, on right: 18 22
-Parameter (44)
-    on left: 24, on right: 22 23
-Local_Var_Declarations (45)
-    on left: 25 26, on right: 25 30 32
-Simple_Statements (46)
-    on left: 27 28, on right: 27 31 32 35
-Method_Body (47)
-    on left: 29 30 31 32, on right: 18
-Local_Var_Declaration (48)
-    on left: 33, on right: 25 26
-Statement (49)
-    on left: 34 35, on right: 41 54
-Simple_Statement (50)
-    on left: 36 37 38 39 40 41 42, on right: 27 28 34
-Name (51)
-    on left: 43 44, on right: 37 38 57 60
-Variable_Access (52)
-    on left: 45 46 47, on right: 43 44
-Field_Access (53)
-    on left: 48 49, on right: 44
-Arg_List (54)
-    on left: 50 51 52, on right: 38 39 51 60
-Conditional_Statement (55)
-    on left: 53 54, on right: 40
-Optional_Expression (56)
-    on left: 55 56, on right: 42
-Expression (57)
-    on left: 57 58 59 60 61 62 63 64 65 66 67, on right: 37 41 47 49
-    51 52 53 54 56 63 64 65 66 67 69 70
-New_Expression (58)
-    on left: 68 69 70, on right: 62
+program (47)
+    on left: 1 2 3 4, on right: 0
+field_decls (48)
+    on left: 5 6, on right: 1 2 6
+field_decl (49)
+    on left: 7 8, on right: 5 6
+identifiers (50)
+    on left: 9 10, on right: 7 10 31
+identifier_arrays (51)
+    on left: 11 12, on right: 8 12
+identifier_array (52)
+    on left: 13, on right: 11 12
+method_decls (53)
+    on left: 14 15, on right: 1 3 15
+method_decl (54)
+    on left: 16 17 18 19, on right: 14 15
+type_identifiers (55)
+    on left: 20 21, on right: 16 18 21
+type_identifier (56)
+    on left: 22, on right: 20 21
+block (57)
+    on left: 23 24 25 26, on right: 16 17 18 19 37 38 39 44
+statements (58)
+    on left: 27 28, on right: 23 25 28
+var_decls (59)
+    on left: 29 30, on right: 23 24 30
+var_decl (60)
+    on left: 31, on right: 29 30
+type (61)
+    on left: 32 33, on right: 7 8 16 17 22 31
+statement (62)
+    on left: 34 35 36 37 38 39 40 41 42 43 44, on right: 27 28
+assign_op (63)
+    on left: 45 46 47, on right: 35
+method_call (64)
+    on left: 48 49 50 51, on right: 36 59
+exprs (65)
+    on left: 52 53, on right: 48 53
+callout_args (66)
+    on left: 54 55, on right: 50 55
+location (67)
+    on left: 56 57, on right: 35 58
+expr (68)
+    on left: 58 59 60 61 62 63 64 65 66 67 68 69 70 71 72 73 74 75
+    76, on right: 35 37 38 39 40 52 53 57 61 62 63 64 65 66 67 68 69
+    70 71 72 73 74 75 76 77
+callout_arg (69)
+    on left: 77 78, on right: 54 55
+literal (70)
+    on left: 79 80 81 82, on right: 60
 
 
 State 0
 
-    0 $accept: . Program $end
+    0 $accept: . program $end
 
     CLASS  shift, and go to state 1
 
-    Program             go to state 2
-    Class_Declarations  go to state 3
-    Class_Declaration   go to state 4
+    program  go to state 2
 
 
 State 1
 
-    4 Class_Declaration: CLASS . ID Class_Body
+    1 program: CLASS . ID OPENB field_decls method_decls CLOSEB
+    2        | CLASS . ID OPENB field_decls CLOSEB
+    3        | CLASS . ID OPENB method_decls CLOSEB
+    4        | CLASS . ID OPENB CLOSEB
 
-    ID  shift, and go to state 5
+    ID  shift, and go to state 3
 
 
 State 2
 
-    0 $accept: Program . $end
+    0 $accept: program . $end
 
-    $end  shift, and go to state 6
+    $end  shift, and go to state 4
 
 
 State 3
 
-    1 Program: Class_Declarations .
-    2 Class_Declarations: Class_Declarations . Class_Declaration
+    1 program: CLASS ID . OPENB field_decls method_decls CLOSEB
+    2        | CLASS ID . OPENB field_decls CLOSEB
+    3        | CLASS ID . OPENB method_decls CLOSEB
+    4        | CLASS ID . OPENB CLOSEB
 
-    CLASS  shift, and go to state 1
-
-    $default  reduce using rule 1 (Program)
-
-    Class_Declaration  go to state 7
+    OPENB  shift, and go to state 5
 
 
 State 4
 
-    3 Class_Declarations: Class_Declaration .
-
-    $default  reduce using rule 3 (Class_Declarations)
-
-
-State 5
-
-    4 Class_Declaration: CLASS ID . Class_Body
-
-    OPENB  shift, and go to state 8
-
-    Class_Body  go to state 9
-
-
-State 6
-
-    0 $accept: Program $end .
+    0 $accept: program $end .
 
     $default  accept
 
 
+State 5
+
+    1 program: CLASS ID OPENB . field_decls method_decls CLOSEB
+    2        | CLASS ID OPENB . field_decls CLOSEB
+    3        | CLASS ID OPENB . method_decls CLOSEB
+    4        | CLASS ID OPENB . CLOSEB
+
+    CLOSEB  shift, and go to state 6
+    BOOL    shift, and go to state 7
+    INT     shift, and go to state 8
+    VOID    shift, and go to state 9
+
+    field_decls   go to state 10
+    field_decl    go to state 11
+    method_decls  go to state 12
+    method_decl   go to state 13
+    type          go to state 14
+
+
+State 6
+
+    4 program: CLASS ID OPENB CLOSEB .
+
+    $default  reduce using rule 4 (program)
+
+
 State 7
 
-    2 Class_Declarations: Class_Declarations Class_Declaration .
+   33 type: BOOL .
 
-    $default  reduce using rule 2 (Class_Declarations)
+    $default  reduce using rule 33 (type)
 
 
 State 8
 
-    5 Class_Body: OPENB . CLOSEB
-    6           | OPENB . Var_Declarations CLOSEB
-    7           | OPENB . Method_Declarations CLOSEB
-    8           | OPENB . Var_Declarations Method_Declarations CLOSEB
+   32 type: INT .
 
-    ID      shift, and go to state 10
-    INT     shift, and go to state 11
-    VOID    shift, and go to state 12
-    CLOSEB  shift, and go to state 13
-
-    Var_Declarations     go to state 14
-    Method_Declarations  go to state 15
-    Var_Declaration      go to state 16
-    Type                 go to state 17
-    Simple_Type          go to state 18
-    Method_Declaration   go to state 19
-    Result_Type          go to state 20
+    $default  reduce using rule 32 (type)
 
 
 State 9
 
-    4 Class_Declaration: CLASS ID Class_Body .
+   18 method_decl: VOID . ID OPENC type_identifiers CLOSEC block
+   19            | VOID . ID OPENC CLOSEC block
 
-    $default  reduce using rule 4 (Class_Declaration)
+    ID  shift, and go to state 15
 
 
 State 10
 
-   17 Simple_Type: ID .
+    1 program: CLASS ID OPENB field_decls . method_decls CLOSEB
+    2        | CLASS ID OPENB field_decls . CLOSEB
+    6 field_decls: field_decls . field_decl
 
-    $default  reduce using rule 17 (Simple_Type)
+    CLOSEB  shift, and go to state 16
+    BOOL    shift, and go to state 7
+    INT     shift, and go to state 8
+    VOID    shift, and go to state 9
+
+    field_decl    go to state 17
+    method_decls  go to state 18
+    method_decl   go to state 13
+    type          go to state 14
 
 
 State 11
 
-   16 Simple_Type: INT .
+    5 field_decls: field_decl .
 
-    $default  reduce using rule 16 (Simple_Type)
+    $default  reduce using rule 5 (field_decls)
 
 
 State 12
 
-   20 Result_Type: VOID .
+    3 program: CLASS ID OPENB method_decls . CLOSEB
+   15 method_decls: method_decls . method_decl
 
-    $default  reduce using rule 20 (Result_Type)
+    CLOSEB  shift, and go to state 19
+    BOOL    shift, and go to state 7
+    INT     shift, and go to state 8
+    VOID    shift, and go to state 9
+
+    method_decl  go to state 20
+    type         go to state 21
 
 
 State 13
 
-    5 Class_Body: OPENB CLOSEB .
+   14 method_decls: method_decl .
 
-    $default  reduce using rule 5 (Class_Body)
+    $default  reduce using rule 14 (method_decls)
 
 
 State 14
 
-    6 Class_Body: OPENB Var_Declarations . CLOSEB
-    8           | OPENB Var_Declarations . Method_Declarations CLOSEB
-    9 Var_Declarations: Var_Declarations . Var_Declaration
+    7 field_decl: type . identifiers ';'
+    8           | type . identifier_arrays ';'
+   16 method_decl: type . ID OPENC type_identifiers CLOSEC block
+   17            | type . ID OPENC CLOSEC block
 
-    ID      shift, and go to state 10
-    INT     shift, and go to state 11
-    VOID    shift, and go to state 12
-    CLOSEB  shift, and go to state 21
+    ID  shift, and go to state 22
 
-    Method_Declarations  go to state 22
-    Var_Declaration      go to state 23
-    Type                 go to state 17
-    Simple_Type          go to state 18
-    Method_Declaration   go to state 19
-    Result_Type          go to state 20
+    identifiers        go to state 23
+    identifier_arrays  go to state 24
+    identifier_array   go to state 25
 
 
 State 15
 
-    7 Class_Body: OPENB Method_Declarations . CLOSEB
-   11 Method_Declarations: Method_Declarations . Method_Declaration
+   18 method_decl: VOID ID . OPENC type_identifiers CLOSEC block
+   19            | VOID ID . OPENC CLOSEC block
 
-    ID      shift, and go to state 10
-    INT     shift, and go to state 11
-    VOID    shift, and go to state 12
-    CLOSEB  shift, and go to state 24
-
-    Type                go to state 25
-    Simple_Type         go to state 18
-    Method_Declaration  go to state 26
-    Result_Type         go to state 20
+    OPENC  shift, and go to state 26
 
 
 State 16
 
-   10 Var_Declarations: Var_Declaration .
+    2 program: CLASS ID OPENB field_decls CLOSEB .
 
-    $default  reduce using rule 10 (Var_Declarations)
+    $default  reduce using rule 2 (program)
 
 
 State 17
 
-   13 Var_Declaration: Type . ID ';'
-   19 Result_Type: Type .
+    6 field_decls: field_decls field_decl .
 
-    ID  shift, and go to state 27
-
-    ID  [reduce using rule 19 (Result_Type)]
+    $default  reduce using rule 6 (field_decls)
 
 
 State 18
 
-   14 Type: Simple_Type .
-   15     | Simple_Type . '[' ']'
+    1 program: CLASS ID OPENB field_decls method_decls . CLOSEB
+   15 method_decls: method_decls . method_decl
 
-    '['  shift, and go to state 28
+    CLOSEB  shift, and go to state 27
+    BOOL    shift, and go to state 7
+    INT     shift, and go to state 8
+    VOID    shift, and go to state 9
 
-    $default  reduce using rule 14 (Type)
+    method_decl  go to state 20
+    type         go to state 21
 
 
 State 19
 
-   12 Method_Declarations: Method_Declaration .
+    3 program: CLASS ID OPENB method_decls CLOSEB .
 
-    $default  reduce using rule 12 (Method_Declarations)
+    $default  reduce using rule 3 (program)
 
 
 State 20
 
-   18 Method_Declaration: Result_Type . ID OPENC Parameter_List CLOSEC Method_Body
+   15 method_decls: method_decls method_decl .
 
-    ID  shift, and go to state 29
+    $default  reduce using rule 15 (method_decls)
 
 
 State 21
 
-    6 Class_Body: OPENB Var_Declarations CLOSEB .
+   16 method_decl: type . ID OPENC type_identifiers CLOSEC block
+   17            | type . ID OPENC CLOSEC block
 
-    $default  reduce using rule 6 (Class_Body)
+    ID  shift, and go to state 28
 
 
 State 22
 
-    8 Class_Body: OPENB Var_Declarations Method_Declarations . CLOSEB
-   11 Method_Declarations: Method_Declarations . Method_Declaration
+    9 identifiers: ID .
+   13 identifier_array: ID . '[' NUM ']'
+   16 method_decl: type ID . OPENC type_identifiers CLOSEC block
+   17            | type ID . OPENC CLOSEC block
 
-    ID      shift, and go to state 10
-    INT     shift, and go to state 11
-    VOID    shift, and go to state 12
-    CLOSEB  shift, and go to state 30
+    OPENC  shift, and go to state 29
+    '['    shift, and go to state 30
 
-    Type                go to state 25
-    Simple_Type         go to state 18
-    Method_Declaration  go to state 26
-    Result_Type         go to state 20
+    $default  reduce using rule 9 (identifiers)
 
 
 State 23
 
-    9 Var_Declarations: Var_Declarations Var_Declaration .
+    7 field_decl: type identifiers . ';'
+   10 identifiers: identifiers . ',' ID
 
-    $default  reduce using rule 9 (Var_Declarations)
+    ','  shift, and go to state 31
+    ';'  shift, and go to state 32
 
 
 State 24
 
-    7 Class_Body: OPENB Method_Declarations CLOSEB .
+    8 field_decl: type identifier_arrays . ';'
+   12 identifier_arrays: identifier_arrays . ',' identifier_array
 
-    $default  reduce using rule 7 (Class_Body)
+    ','  shift, and go to state 33
+    ';'  shift, and go to state 34
 
 
 State 25
 
-   19 Result_Type: Type .
+   11 identifier_arrays: identifier_array .
 
-    $default  reduce using rule 19 (Result_Type)
+    $default  reduce using rule 11 (identifier_arrays)
 
 
 State 26
 
-   11 Method_Declarations: Method_Declarations Method_Declaration .
+   18 method_decl: VOID ID OPENC . type_identifiers CLOSEC block
+   19            | VOID ID OPENC . CLOSEC block
 
-    $default  reduce using rule 11 (Method_Declarations)
+    CLOSEC  shift, and go to state 35
+    BOOL    shift, and go to state 7
+    INT     shift, and go to state 8
+
+    type_identifiers  go to state 36
+    type_identifier   go to state 37
+    type              go to state 38
 
 
 State 27
 
-   13 Var_Declaration: Type ID . ';'
+    1 program: CLASS ID OPENB field_decls method_decls CLOSEB .
 
-    ';'  shift, and go to state 31
+    $default  reduce using rule 1 (program)
 
 
 State 28
 
-   15 Type: Simple_Type '[' . ']'
+   16 method_decl: type ID . OPENC type_identifiers CLOSEC block
+   17            | type ID . OPENC CLOSEC block
 
-    ']'  shift, and go to state 32
+    OPENC  shift, and go to state 29
 
 
 State 29
 
-   18 Method_Declaration: Result_Type ID . OPENC Parameter_List CLOSEC Method_Body
+   16 method_decl: type ID OPENC . type_identifiers CLOSEC block
+   17            | type ID OPENC . CLOSEC block
 
-    OPENC  shift, and go to state 33
+    CLOSEC  shift, and go to state 39
+    BOOL    shift, and go to state 7
+    INT     shift, and go to state 8
+
+    type_identifiers  go to state 40
+    type_identifier   go to state 37
+    type              go to state 38
 
 
 State 30
 
-    8 Class_Body: OPENB Var_Declarations Method_Declarations CLOSEB .
+   13 identifier_array: ID '[' . NUM ']'
 
-    $default  reduce using rule 8 (Class_Body)
+    NUM  shift, and go to state 41
 
 
 State 31
 
-   13 Var_Declaration: Type ID ';' .
+   10 identifiers: identifiers ',' . ID
 
-    $default  reduce using rule 13 (Var_Declaration)
+    ID  shift, and go to state 42
 
 
 State 32
 
-   15 Type: Simple_Type '[' ']' .
+    7 field_decl: type identifiers ';' .
 
-    $default  reduce using rule 15 (Type)
+    $default  reduce using rule 7 (field_decl)
 
 
 State 33
 
-   18 Method_Declaration: Result_Type ID OPENC . Parameter_List CLOSEC Method_Body
+   12 identifier_arrays: identifier_arrays ',' . identifier_array
 
-    ID   shift, and go to state 10
-    INT  shift, and go to state 11
+    ID  shift, and go to state 43
 
-    $default  reduce using rule 21 (Parameter_List)
-
-    Type            go to state 34
-    Simple_Type     go to state 18
-    Parameter_List  go to state 35
-    Parameter       go to state 36
+    identifier_array  go to state 44
 
 
 State 34
 
-   24 Parameter: Type . ID
+    8 field_decl: type identifier_arrays ';' .
 
-    ID  shift, and go to state 37
+    $default  reduce using rule 8 (field_decl)
 
 
 State 35
 
-   18 Method_Declaration: Result_Type ID OPENC Parameter_List . CLOSEC Method_Body
-   22 Parameter_List: Parameter_List . ',' Parameter
+   19 method_decl: VOID ID OPENC CLOSEC . block
 
-    CLOSEC  shift, and go to state 38
-    ','     shift, and go to state 39
+    OPENB  shift, and go to state 45
+
+    block  go to state 46
 
 
 State 36
 
-   23 Parameter_List: Parameter .
+   18 method_decl: VOID ID OPENC type_identifiers . CLOSEC block
+   21 type_identifiers: type_identifiers . ',' type_identifier
 
-    $default  reduce using rule 23 (Parameter_List)
+    ','     shift, and go to state 47
+    CLOSEC  shift, and go to state 48
 
 
 State 37
 
-   24 Parameter: Type ID .
+   20 type_identifiers: type_identifier .
 
-    $default  reduce using rule 24 (Parameter)
+    $default  reduce using rule 20 (type_identifiers)
 
 
 State 38
 
-   18 Method_Declaration: Result_Type ID OPENC Parameter_List CLOSEC . Method_Body
+   22 type_identifier: type . ID
 
-    OPENB  shift, and go to state 40
-
-    Method_Body  go to state 41
+    ID  shift, and go to state 49
 
 
 State 39
 
-   22 Parameter_List: Parameter_List ',' . Parameter
+   17 method_decl: type ID OPENC CLOSEC . block
 
-    ID   shift, and go to state 10
-    INT  shift, and go to state 11
+    OPENB  shift, and go to state 45
 
-    Type         go to state 34
-    Simple_Type  go to state 18
-    Parameter    go to state 42
+    block  go to state 50
 
 
 State 40
 
-   29 Method_Body: OPENB . CLOSEB
-   30            | OPENB . Local_Var_Declarations CLOSEB
-   31            | OPENB . Simple_Statements CLOSEB
-   32            | OPENB . Local_Var_Declarations Simple_Statements CLOSEB
+   16 method_decl: type ID OPENC type_identifiers . CLOSEC block
+   21 type_identifiers: type_identifiers . ',' type_identifier
 
-    ID      shift, and go to state 43
-    INT     shift, and go to state 11
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    CLOSEB  shift, and go to state 49
-    ';'     shift, and go to state 50
-
-    Type                    go to state 51
-    Simple_Type             go to state 18
-    Local_Var_Declarations  go to state 52
-    Simple_Statements       go to state 53
-    Local_Var_Declaration   go to state 54
-    Simple_Statement        go to state 55
-    Name                    go to state 56
-    Variable_Access         go to state 57
-    Conditional_Statement   go to state 58
+    ','     shift, and go to state 47
+    CLOSEC  shift, and go to state 51
 
 
 State 41
 
-   18 Method_Declaration: Result_Type ID OPENC Parameter_List CLOSEC Method_Body .
+   13 identifier_array: ID '[' NUM . ']'
 
-    $default  reduce using rule 18 (Method_Declaration)
+    ']'  shift, and go to state 52
 
 
 State 42
 
-   22 Parameter_List: Parameter_List ',' Parameter .
+   10 identifiers: identifiers ',' ID .
 
-    $default  reduce using rule 22 (Parameter_List)
+    $default  reduce using rule 10 (identifiers)
 
 
 State 43
 
-   17 Simple_Type: ID .
-   46 Variable_Access: ID .
-   47                | ID . '[' Expression ']'
+   13 identifier_array: ID . '[' NUM ']'
 
-    '['  shift, and go to state 59
-
-    ID        reduce using rule 17 (Simple_Type)
-    '['       [reduce using rule 17 (Simple_Type)]
-    $default  reduce using rule 46 (Variable_Access)
+    '['  shift, and go to state 30
 
 
 State 44
 
-   53 Conditional_Statement: IF . OPENC Expression CLOSEC
-   54                      | IF . OPENC Expression CLOSEC Statement ELSE Statement
+   12 identifier_arrays: identifier_arrays ',' identifier_array .
 
-    OPENC  shift, and go to state 60
+    $default  reduce using rule 12 (identifier_arrays)
 
 
 State 45
 
-   39 Simple_Statement: PRINT . OPENC Arg_List CLOSEC ';'
+   23 block: OPENB . var_decls statements CLOSEB
+   24      | OPENB . var_decls CLOSEB
+   25      | OPENB . statements CLOSEB
+   26      | OPENB . CLOSEB
 
-    OPENC  shift, and go to state 61
+    ';'       shift, and go to state 53
+    OPENB     shift, and go to state 45
+    CLOSEB    shift, and go to state 54
+    BOOL      shift, and go to state 7
+    BREAK     shift, and go to state 55
+    CALLOUT   shift, and go to state 56
+    CONTINUE  shift, and go to state 57
+    FOR       shift, and go to state 58
+    IF        shift, and go to state 59
+    INT       shift, and go to state 8
+    RETURN    shift, and go to state 60
+    ID        shift, and go to state 61
+
+    block        go to state 62
+    statements   go to state 63
+    var_decls    go to state 64
+    var_decl     go to state 65
+    type         go to state 66
+    statement    go to state 67
+    method_call  go to state 68
+    location     go to state 69
 
 
 State 46
 
-   45 Variable_Access: THIS .
+   19 method_decl: VOID ID OPENC CLOSEC block .
 
-    $default  reduce using rule 45 (Variable_Access)
+    $default  reduce using rule 19 (method_decl)
 
 
 State 47
 
-   41 Simple_Statement: WHILE . OPENC Expression CLOSEC Statement
+   21 type_identifiers: type_identifiers ',' . type_identifier
 
-    OPENC  shift, and go to state 62
+    BOOL  shift, and go to state 7
+    INT   shift, and go to state 8
+
+    type_identifier  go to state 70
+    type             go to state 38
 
 
 State 48
 
-   42 Simple_Statement: RETURN . Optional_Expression ';'
+   18 method_decl: VOID ID OPENC type_identifiers CLOSEC . block
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
+    OPENB  shift, and go to state 45
 
-    $default  reduce using rule 55 (Optional_Expression)
-
-    Name                 go to state 70
-    Variable_Access      go to state 57
-    Optional_Expression  go to state 71
-    Expression           go to state 72
-    New_Expression       go to state 73
+    block  go to state 71
 
 
 State 49
 
-   29 Method_Body: OPENB CLOSEB .
+   22 type_identifier: type ID .
 
-    $default  reduce using rule 29 (Method_Body)
+    $default  reduce using rule 22 (type_identifier)
 
 
 State 50
 
-   36 Simple_Statement: ';' .
+   17 method_decl: type ID OPENC CLOSEC block .
 
-    $default  reduce using rule 36 (Simple_Statement)
+    $default  reduce using rule 17 (method_decl)
 
 
 State 51
 
-   33 Local_Var_Declaration: Type . ID ';'
+   16 method_decl: type ID OPENC type_identifiers CLOSEC . block
 
-    ID  shift, and go to state 74
+    OPENB  shift, and go to state 45
+
+    block  go to state 72
 
 
 State 52
 
-   25 Local_Var_Declarations: Local_Var_Declarations . Local_Var_Declaration
-   30 Method_Body: OPENB Local_Var_Declarations . CLOSEB
-   32            | OPENB Local_Var_Declarations . Simple_Statements CLOSEB
+   13 identifier_array: ID '[' NUM ']' .
 
-    ID      shift, and go to state 43
-    INT     shift, and go to state 11
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    CLOSEB  shift, and go to state 75
-    ';'     shift, and go to state 50
-
-    Type                   go to state 51
-    Simple_Type            go to state 18
-    Simple_Statements      go to state 76
-    Local_Var_Declaration  go to state 77
-    Simple_Statement       go to state 55
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    $default  reduce using rule 13 (identifier_array)
 
 
 State 53
 
-   27 Simple_Statements: Simple_Statements . Simple_Statement
-   31 Method_Body: OPENB Simple_Statements . CLOSEB
+   34 statement: ';' .
 
-    ID      shift, and go to state 64
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    CLOSEB  shift, and go to state 78
-    ';'     shift, and go to state 50
-
-    Simple_Statement       go to state 79
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    $default  reduce using rule 34 (statement)
 
 
 State 54
 
-   26 Local_Var_Declarations: Local_Var_Declaration .
+   26 block: OPENB CLOSEB .
 
-    $default  reduce using rule 26 (Local_Var_Declarations)
+    $default  reduce using rule 26 (block)
 
 
 State 55
 
-   28 Simple_Statements: Simple_Statement .
+   42 statement: BREAK . ';'
 
-    $default  reduce using rule 28 (Simple_Statements)
+    ';'  shift, and go to state 73
 
 
 State 56
 
-   37 Simple_Statement: Name . '=' Expression ';'
-   38                 | Name . OPENC Arg_List CLOSEC ';'
+   50 method_call: CALLOUT . OPENC STRING ',' callout_args CLOSEC
+   51            | CALLOUT . OPENC STRING CLOSEC
 
-    OPENC  shift, and go to state 80
-    '='    shift, and go to state 81
+    OPENC  shift, and go to state 74
 
 
 State 57
 
-   43 Name: Variable_Access .
-   44     | Variable_Access . '.' Field_Access
+   43 statement: CONTINUE . ';'
 
-    '.'  shift, and go to state 82
-
-    $default  reduce using rule 43 (Name)
+    ';'  shift, and go to state 75
 
 
 State 58
 
-   40 Simple_Statement: Conditional_Statement .
+   39 statement: FOR . ID EQ expr ',' expr block
 
-    $default  reduce using rule 40 (Simple_Statement)
+    ID  shift, and go to state 76
 
 
 State 59
 
-   47 Variable_Access: ID '[' . Expression ']'
+   37 statement: IF . OPENC expr CLOSEC block ELSE block
+   38          | IF . OPENC expr CLOSEC block
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 83
-    New_Expression   go to state 73
+    OPENC  shift, and go to state 77
 
 
 State 60
 
-   53 Conditional_Statement: IF OPENC . Expression CLOSEC
-   54                      | IF OPENC . Expression CLOSEC Statement ELSE Statement
+   40 statement: RETURN . expr ';'
+   41          | RETURN . ';'
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
+    ';'      shift, and go to state 78
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 84
-    New_Expression   go to state 73
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 88
+    literal      go to state 89
 
 
 State 61
 
-   39 Simple_Statement: PRINT OPENC . Arg_List CLOSEC ';'
+   48 method_call: ID . OPENC exprs CLOSEC
+   49            | ID . OPENC CLOSEC
+   56 location: ID .
+   57         | ID . '[' expr ']'
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
+    OPENC  shift, and go to state 90
+    '['    shift, and go to state 91
 
-    $default  reduce using rule 50 (Arg_List)
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Arg_List         go to state 85
-    Expression       go to state 86
-    New_Expression   go to state 73
+    $default  reduce using rule 56 (location)
 
 
 State 62
 
-   41 Simple_Statement: WHILE OPENC . Expression CLOSEC Statement
+   44 statement: block .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 87
-    New_Expression   go to state 73
+    $default  reduce using rule 44 (statement)
 
 
 State 63
 
-   58 Expression: NUMBER .
+   25 block: OPENB statements . CLOSEB
+   28 statements: statements . statement
 
-    $default  reduce using rule 58 (Expression)
+    ';'       shift, and go to state 53
+    OPENB     shift, and go to state 45
+    CLOSEB    shift, and go to state 92
+    BREAK     shift, and go to state 55
+    CALLOUT   shift, and go to state 56
+    CONTINUE  shift, and go to state 57
+    FOR       shift, and go to state 58
+    IF        shift, and go to state 59
+    RETURN    shift, and go to state 60
+    ID        shift, and go to state 61
+
+    block        go to state 62
+    statement    go to state 93
+    method_call  go to state 68
+    location     go to state 69
 
 
 State 64
 
-   46 Variable_Access: ID .
-   47                | ID . '[' Expression ']'
+   23 block: OPENB var_decls . statements CLOSEB
+   24      | OPENB var_decls . CLOSEB
+   30 var_decls: var_decls . var_decl
 
-    '['  shift, and go to state 59
+    ';'       shift, and go to state 53
+    OPENB     shift, and go to state 45
+    CLOSEB    shift, and go to state 94
+    BOOL      shift, and go to state 7
+    BREAK     shift, and go to state 55
+    CALLOUT   shift, and go to state 56
+    CONTINUE  shift, and go to state 57
+    FOR       shift, and go to state 58
+    IF        shift, and go to state 59
+    INT       shift, and go to state 8
+    RETURN    shift, and go to state 60
+    ID        shift, and go to state 61
 
-    $default  reduce using rule 46 (Variable_Access)
+    block        go to state 62
+    statements   go to state 95
+    var_decl     go to state 96
+    type         go to state 66
+    statement    go to state 67
+    method_call  go to state 68
+    location     go to state 69
 
 
 State 65
 
-   63 Expression: UNARYOP . Expression
+   29 var_decls: var_decl .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 88
-    New_Expression   go to state 73
+    $default  reduce using rule 29 (var_decls)
 
 
 State 66
 
-   68 New_Expression: NEW . ID OPENC CLOSEC
-   69               | NEW . INT '[' Expression ']'
-   70               | NEW . ID '[' Expression ']'
+   31 var_decl: type . identifiers ';'
 
-    ID   shift, and go to state 89
-    INT  shift, and go to state 90
+    ID  shift, and go to state 97
+
+    identifiers  go to state 98
 
 
 State 67
 
-   59 Expression: NUL .
+   27 statements: statement .
 
-    $default  reduce using rule 59 (Expression)
+    $default  reduce using rule 27 (statements)
 
 
 State 68
 
-   61 Expression: READ . OPENC CLOSEC
+   36 statement: method_call . ';'
 
-    OPENC  shift, and go to state 91
+    ';'  shift, and go to state 99
 
 
 State 69
 
-   67 Expression: OPENC . Expression CLOSEC
+   35 statement: location . assign_op expr ';'
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
+    EQ  shift, and go to state 100
+    PE  shift, and go to state 101
+    ME  shift, and go to state 102
 
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 92
-    New_Expression   go to state 73
+    assign_op  go to state 103
 
 
 State 70
 
-   57 Expression: Name .
-   60           | Name . OPENC Arg_List CLOSEC
+   21 type_identifiers: type_identifiers ',' type_identifier .
 
-    OPENC  shift, and go to state 93
-
-    $default  reduce using rule 57 (Expression)
+    $default  reduce using rule 21 (type_identifiers)
 
 
 State 71
 
-   42 Simple_Statement: RETURN Optional_Expression . ';'
+   18 method_decl: VOID ID OPENC type_identifiers CLOSEC block .
 
-    ';'  shift, and go to state 94
+    $default  reduce using rule 18 (method_decl)
 
 
 State 72
 
-   56 Optional_Expression: Expression .
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   16 method_decl: type ID OPENC type_identifiers CLOSEC block .
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-
-    $default  reduce using rule 56 (Optional_Expression)
+    $default  reduce using rule 16 (method_decl)
 
 
 State 73
 
-   62 Expression: New_Expression .
+   42 statement: BREAK ';' .
 
-    $default  reduce using rule 62 (Expression)
+    $default  reduce using rule 42 (statement)
 
 
 State 74
 
-   33 Local_Var_Declaration: Type ID . ';'
+   50 method_call: CALLOUT OPENC . STRING ',' callout_args CLOSEC
+   51            | CALLOUT OPENC . STRING CLOSEC
 
-    ';'  shift, and go to state 98
+    STRING  shift, and go to state 104
 
 
 State 75
 
-   30 Method_Body: OPENB Local_Var_Declarations CLOSEB .
+   43 statement: CONTINUE ';' .
 
-    $default  reduce using rule 30 (Method_Body)
+    $default  reduce using rule 43 (statement)
 
 
 State 76
 
-   27 Simple_Statements: Simple_Statements . Simple_Statement
-   32 Method_Body: OPENB Local_Var_Declarations Simple_Statements . CLOSEB
+   39 statement: FOR ID . EQ expr ',' expr block
 
-    ID      shift, and go to state 64
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    CLOSEB  shift, and go to state 99
-    ';'     shift, and go to state 50
-
-    Simple_Statement       go to state 79
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    EQ  shift, and go to state 105
 
 
 State 77
 
-   25 Local_Var_Declarations: Local_Var_Declarations Local_Var_Declaration .
+   37 statement: IF OPENC . expr CLOSEC block ELSE block
+   38          | IF OPENC . expr CLOSEC block
 
-    $default  reduce using rule 25 (Local_Var_Declarations)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 106
+    literal      go to state 89
 
 
 State 78
 
-   31 Method_Body: OPENB Simple_Statements CLOSEB .
+   41 statement: RETURN ';' .
 
-    $default  reduce using rule 31 (Method_Body)
+    $default  reduce using rule 41 (statement)
 
 
 State 79
 
-   27 Simple_Statements: Simple_Statements Simple_Statement .
+   76 expr: OPENC . expr CLOSEC
 
-    $default  reduce using rule 27 (Simple_Statements)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 107
+    literal      go to state 89
 
 
 State 80
 
-   38 Simple_Statement: Name OPENC . Arg_List CLOSEC ';'
+   82 literal: FALSE .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    $default  reduce using rule 50 (Arg_List)
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Arg_List         go to state 100
-    Expression       go to state 86
-    New_Expression   go to state 73
+    $default  reduce using rule 82 (literal)
 
 
 State 81
 
-   37 Simple_Statement: Name '=' . Expression ';'
+   81 literal: TRUE .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 101
-    New_Expression   go to state 73
+    $default  reduce using rule 81 (literal)
 
 
 State 82
 
-   44 Name: Variable_Access '.' . Field_Access
+   75 expr: MINUS . expr
 
-    ID  shift, and go to state 102
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    Field_Access  go to state 103
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 108
+    literal      go to state 89
 
 
 State 83
 
-   47 Variable_Access: ID '[' Expression . ']'
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   74 expr: NOT . expr
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-    ']'    shift, and go to state 104
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 109
+    literal      go to state 89
 
 
 State 84
 
-   53 Conditional_Statement: IF OPENC Expression . CLOSEC
-   54                      | IF OPENC Expression . CLOSEC Statement ELSE Statement
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   79 literal: NUM .
 
-    ADDOP   shift, and go to state 95
-    MULOP   shift, and go to state 96
-    RELOP   shift, and go to state 97
-    CLOSEC  shift, and go to state 105
+    $default  reduce using rule 79 (literal)
 
 
 State 85
 
-   39 Simple_Statement: PRINT OPENC Arg_List . CLOSEC ';'
-   51 Arg_List: Arg_List . ',' Expression
+   80 literal: CHAR .
 
-    CLOSEC  shift, and go to state 106
-    ','     shift, and go to state 107
+    $default  reduce using rule 80 (literal)
 
 
 State 86
 
-   52 Arg_List: Expression .
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   59 expr: method_call .
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-
-    $default  reduce using rule 52 (Arg_List)
+    $default  reduce using rule 59 (expr)
 
 
 State 87
 
-   41 Simple_Statement: WHILE OPENC Expression . CLOSEC Statement
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   58 expr: location .
 
-    ADDOP   shift, and go to state 95
-    MULOP   shift, and go to state 96
-    RELOP   shift, and go to state 97
-    CLOSEC  shift, and go to state 108
+    $default  reduce using rule 58 (expr)
 
 
 State 88
 
-   63 Expression: UNARYOP Expression .
-   64           | Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   40 statement: RETURN expr . ';'
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 63 (Expression)
+    ';'    shift, and go to state 110
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
 
 
 State 89
 
-   68 New_Expression: NEW ID . OPENC CLOSEC
-   70               | NEW ID . '[' Expression ']'
+   60 expr: literal .
 
-    OPENC  shift, and go to state 109
-    '['    shift, and go to state 110
+    $default  reduce using rule 60 (expr)
 
 
 State 90
 
-   69 New_Expression: NEW INT . '[' Expression ']'
+   48 method_call: ID OPENC . exprs CLOSEC
+   49            | ID OPENC . CLOSEC
 
-    '['  shift, and go to state 111
+    OPENC    shift, and go to state 79
+    CLOSEC   shift, and go to state 124
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    exprs        go to state 125
+    location     go to state 87
+    expr         go to state 126
+    literal      go to state 89
 
 
 State 91
 
-   61 Expression: READ OPENC . CLOSEC
+   57 location: ID '[' . expr ']'
 
-    CLOSEC  shift, and go to state 112
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 127
+    literal      go to state 89
 
 
 State 92
 
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
-   67           | OPENC Expression . CLOSEC
+   25 block: OPENB statements CLOSEB .
 
-    ADDOP   shift, and go to state 95
-    MULOP   shift, and go to state 96
-    RELOP   shift, and go to state 97
-    CLOSEC  shift, and go to state 113
+    $default  reduce using rule 25 (block)
 
 
 State 93
 
-   60 Expression: Name OPENC . Arg_List CLOSEC
+   28 statements: statements statement .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    $default  reduce using rule 50 (Arg_List)
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Arg_List         go to state 114
-    Expression       go to state 86
-    New_Expression   go to state 73
+    $default  reduce using rule 28 (statements)
 
 
 State 94
 
-   42 Simple_Statement: RETURN Optional_Expression ';' .
+   24 block: OPENB var_decls CLOSEB .
 
-    $default  reduce using rule 42 (Simple_Statement)
+    $default  reduce using rule 24 (block)
 
 
 State 95
 
-   65 Expression: Expression ADDOP . Expression
+   23 block: OPENB var_decls statements . CLOSEB
+   28 statements: statements . statement
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
+    ';'       shift, and go to state 53
+    OPENB     shift, and go to state 45
+    CLOSEB    shift, and go to state 128
+    BREAK     shift, and go to state 55
+    CALLOUT   shift, and go to state 56
+    CONTINUE  shift, and go to state 57
+    FOR       shift, and go to state 58
+    IF        shift, and go to state 59
+    RETURN    shift, and go to state 60
+    ID        shift, and go to state 61
 
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 115
-    New_Expression   go to state 73
+    block        go to state 62
+    statement    go to state 93
+    method_call  go to state 68
+    location     go to state 69
 
 
 State 96
 
-   66 Expression: Expression MULOP . Expression
+   30 var_decls: var_decls var_decl .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 116
-    New_Expression   go to state 73
+    $default  reduce using rule 30 (var_decls)
 
 
 State 97
 
-   64 Expression: Expression RELOP . Expression
+    9 identifiers: ID .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 117
-    New_Expression   go to state 73
+    $default  reduce using rule 9 (identifiers)
 
 
 State 98
 
-   33 Local_Var_Declaration: Type ID ';' .
+   10 identifiers: identifiers . ',' ID
+   31 var_decl: type identifiers . ';'
 
-    $default  reduce using rule 33 (Local_Var_Declaration)
+    ','  shift, and go to state 31
+    ';'  shift, and go to state 129
 
 
 State 99
 
-   32 Method_Body: OPENB Local_Var_Declarations Simple_Statements CLOSEB .
+   36 statement: method_call ';' .
 
-    $default  reduce using rule 32 (Method_Body)
+    $default  reduce using rule 36 (statement)
 
 
 State 100
 
-   38 Simple_Statement: Name OPENC Arg_List . CLOSEC ';'
-   51 Arg_List: Arg_List . ',' Expression
+   45 assign_op: EQ .
 
-    CLOSEC  shift, and go to state 118
-    ','     shift, and go to state 107
+    $default  reduce using rule 45 (assign_op)
 
 
 State 101
 
-   37 Simple_Statement: Name '=' Expression . ';'
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   46 assign_op: PE .
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-    ';'    shift, and go to state 119
+    $default  reduce using rule 46 (assign_op)
 
 
 State 102
 
-   48 Field_Access: ID .
-   49             | ID . '[' Expression ']'
+   47 assign_op: ME .
 
-    '['  shift, and go to state 120
-
-    $default  reduce using rule 48 (Field_Access)
+    $default  reduce using rule 47 (assign_op)
 
 
 State 103
 
-   44 Name: Variable_Access '.' Field_Access .
+   35 statement: location assign_op . expr ';'
 
-    $default  reduce using rule 44 (Name)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 130
+    literal      go to state 89
 
 
 State 104
 
-   47 Variable_Access: ID '[' Expression ']' .
+   50 method_call: CALLOUT OPENC STRING . ',' callout_args CLOSEC
+   51            | CALLOUT OPENC STRING . CLOSEC
 
-    $default  reduce using rule 47 (Variable_Access)
+    ','     shift, and go to state 131
+    CLOSEC  shift, and go to state 132
 
 
 State 105
 
-   53 Conditional_Statement: IF OPENC Expression CLOSEC .
-   54                      | IF OPENC Expression CLOSEC . Statement ELSE Statement
+   39 statement: FOR ID EQ . expr ',' expr block
 
-    ID      shift, and go to state 64
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    OPENB   shift, and go to state 121
-    ';'     shift, and go to state 50
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    ID        [reduce using rule 53 (Conditional_Statement)]
-    IF        [reduce using rule 53 (Conditional_Statement)]
-    PRINT     [reduce using rule 53 (Conditional_Statement)]
-    THIS      [reduce using rule 53 (Conditional_Statement)]
-    WHILE     [reduce using rule 53 (Conditional_Statement)]
-    RETURN    [reduce using rule 53 (Conditional_Statement)]
-    ';'       [reduce using rule 53 (Conditional_Statement)]
-    $default  reduce using rule 53 (Conditional_Statement)
-
-    Statement              go to state 122
-    Simple_Statement       go to state 123
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 133
+    literal      go to state 89
 
 
 State 106
 
-   39 Simple_Statement: PRINT OPENC Arg_List CLOSEC . ';'
+   37 statement: IF OPENC expr . CLOSEC block ELSE block
+   38          | IF OPENC expr . CLOSEC block
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    ';'  shift, and go to state 124
+    CLOSEC  shift, and go to state 134
+    OR      shift, and go to state 111
+    AND     shift, and go to state 112
+    EE      shift, and go to state 113
+    NE      shift, and go to state 114
+    LE      shift, and go to state 115
+    LT      shift, and go to state 116
+    GE      shift, and go to state 117
+    GT      shift, and go to state 118
+    PLUS    shift, and go to state 119
+    MINUS   shift, and go to state 120
+    MUL     shift, and go to state 121
+    DIV     shift, and go to state 122
+    MOD     shift, and go to state 123
 
 
 State 107
 
-   51 Arg_List: Arg_List ',' . Expression
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+   76     | OPENC expr . CLOSEC
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 125
-    New_Expression   go to state 73
+    CLOSEC  shift, and go to state 135
+    OR      shift, and go to state 111
+    AND     shift, and go to state 112
+    EE      shift, and go to state 113
+    NE      shift, and go to state 114
+    LE      shift, and go to state 115
+    LT      shift, and go to state 116
+    GE      shift, and go to state 117
+    GT      shift, and go to state 118
+    PLUS    shift, and go to state 119
+    MINUS   shift, and go to state 120
+    MUL     shift, and go to state 121
+    DIV     shift, and go to state 122
+    MOD     shift, and go to state 123
 
 
 State 108
 
-   41 Simple_Statement: WHILE OPENC Expression CLOSEC . Statement
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+   75     | MINUS expr .
 
-    ID      shift, and go to state 64
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    OPENB   shift, and go to state 121
-    ';'     shift, and go to state 50
-
-    Statement              go to state 126
-    Simple_Statement       go to state 123
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    $default  reduce using rule 75 (expr)
 
 
 State 109
 
-   68 New_Expression: NEW ID OPENC . CLOSEC
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+   74     | NOT expr .
 
-    CLOSEC  shift, and go to state 127
+    $default  reduce using rule 74 (expr)
 
 
 State 110
 
-   70 New_Expression: NEW ID '[' . Expression ']'
+   40 statement: RETURN expr ';' .
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
-
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 128
-    New_Expression   go to state 73
+    $default  reduce using rule 40 (statement)
 
 
 State 111
 
-   69 New_Expression: NEW INT '[' . Expression ']'
+   61 expr: expr OR . expr
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 129
-    New_Expression   go to state 73
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 136
+    literal      go to state 89
 
 
 State 112
 
-   61 Expression: READ OPENC CLOSEC .
+   62 expr: expr AND . expr
 
-    $default  reduce using rule 61 (Expression)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 137
+    literal      go to state 89
 
 
 State 113
 
-   67 Expression: OPENC Expression CLOSEC .
+   63 expr: expr EE . expr
 
-    $default  reduce using rule 67 (Expression)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 138
+    literal      go to state 89
 
 
 State 114
 
-   51 Arg_List: Arg_List . ',' Expression
-   60 Expression: Name OPENC Arg_List . CLOSEC
+   64 expr: expr NE . expr
 
-    CLOSEC  shift, and go to state 130
-    ','     shift, and go to state 107
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 139
+    literal      go to state 89
 
 
 State 115
 
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   65           | Expression ADDOP Expression .
-   66           | Expression . MULOP Expression
+   66 expr: expr LE . expr
 
-    MULOP  shift, and go to state 96
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    $default  reduce using rule 65 (Expression)
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 140
+    literal      go to state 89
 
 
 State 116
 
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
-   66           | Expression MULOP Expression .
+   65 expr: expr LT . expr
 
-    $default  reduce using rule 66 (Expression)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 141
+    literal      go to state 89
 
 
 State 117
 
-   64 Expression: Expression . RELOP Expression
-   64           | Expression RELOP Expression .
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   67 expr: expr GE . expr
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    $default  reduce using rule 64 (Expression)
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 142
+    literal      go to state 89
 
 
 State 118
 
-   38 Simple_Statement: Name OPENC Arg_List CLOSEC . ';'
+   68 expr: expr GT . expr
 
-    ';'  shift, and go to state 131
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 143
+    literal      go to state 89
 
 
 State 119
 
-   37 Simple_Statement: Name '=' Expression ';' .
+   69 expr: expr PLUS . expr
 
-    $default  reduce using rule 37 (Simple_Statement)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 144
+    literal      go to state 89
 
 
 State 120
 
-   49 Field_Access: ID '[' . Expression ']'
+   70 expr: expr MINUS . expr
 
-    NUMBER   shift, and go to state 63
-    ID       shift, and go to state 64
-    UNARYOP  shift, and go to state 65
-    NEW      shift, and go to state 66
-    NUL      shift, and go to state 67
-    READ     shift, and go to state 68
-    THIS     shift, and go to state 46
-    OPENC    shift, and go to state 69
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    Name             go to state 70
-    Variable_Access  go to state 57
-    Expression       go to state 132
-    New_Expression   go to state 73
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 145
+    literal      go to state 89
 
 
 State 121
 
-   35 Statement: OPENB . Simple_Statements CLOSEB
+   71 expr: expr MUL . expr
 
-    ID      shift, and go to state 64
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    ';'     shift, and go to state 50
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
 
-    Simple_Statements      go to state 133
-    Simple_Statement       go to state 55
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 146
+    literal      go to state 89
 
 
 State 122
 
-   54 Conditional_Statement: IF OPENC Expression CLOSEC Statement . ELSE Statement
+   72 expr: expr DIV . expr
 
-    ELSE  shift, and go to state 134
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 147
+    literal      go to state 89
 
 
 State 123
 
-   34 Statement: Simple_Statement .
+   73 expr: expr MOD . expr
 
-    $default  reduce using rule 34 (Statement)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 148
+    literal      go to state 89
 
 
 State 124
 
-   39 Simple_Statement: PRINT OPENC Arg_List CLOSEC ';' .
+   49 method_call: ID OPENC CLOSEC .
 
-    $default  reduce using rule 39 (Simple_Statement)
+    $default  reduce using rule 49 (method_call)
 
 
 State 125
 
-   51 Arg_List: Arg_List ',' Expression .
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   48 method_call: ID OPENC exprs . CLOSEC
+   53 exprs: exprs . ',' expr
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-
-    $default  reduce using rule 51 (Arg_List)
+    ','     shift, and go to state 149
+    CLOSEC  shift, and go to state 150
 
 
 State 126
 
-   41 Simple_Statement: WHILE OPENC Expression CLOSEC Statement .
+   52 exprs: expr .
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 41 (Simple_Statement)
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    $default  reduce using rule 52 (exprs)
 
 
 State 127
 
-   68 New_Expression: NEW ID OPENC CLOSEC .
+   57 location: ID '[' expr . ']'
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 68 (New_Expression)
+    ']'    shift, and go to state 151
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
 
 
 State 128
 
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
-   70 New_Expression: NEW ID '[' Expression . ']'
+   23 block: OPENB var_decls statements CLOSEB .
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-    ']'    shift, and go to state 135
+    $default  reduce using rule 23 (block)
 
 
 State 129
 
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
-   69 New_Expression: NEW INT '[' Expression . ']'
+   31 var_decl: type identifiers ';' .
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-    ']'    shift, and go to state 136
+    $default  reduce using rule 31 (var_decl)
 
 
 State 130
 
-   60 Expression: Name OPENC Arg_List CLOSEC .
+   35 statement: location assign_op expr . ';'
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 60 (Expression)
+    ';'    shift, and go to state 152
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
 
 
 State 131
 
-   38 Simple_Statement: Name OPENC Arg_List CLOSEC ';' .
+   50 method_call: CALLOUT OPENC STRING ',' . callout_args CLOSEC
 
-    $default  reduce using rule 38 (Simple_Statement)
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    STRING   shift, and go to state 153
+    CHAR     shift, and go to state 85
+
+    method_call   go to state 86
+    callout_args  go to state 154
+    location      go to state 87
+    expr          go to state 155
+    callout_arg   go to state 156
+    literal       go to state 89
 
 
 State 132
 
-   49 Field_Access: ID '[' Expression . ']'
-   64 Expression: Expression . RELOP Expression
-   65           | Expression . ADDOP Expression
-   66           | Expression . MULOP Expression
+   51 method_call: CALLOUT OPENC STRING CLOSEC .
 
-    ADDOP  shift, and go to state 95
-    MULOP  shift, and go to state 96
-    RELOP  shift, and go to state 97
-    ']'    shift, and go to state 137
+    $default  reduce using rule 51 (method_call)
 
 
 State 133
 
-   27 Simple_Statements: Simple_Statements . Simple_Statement
-   35 Statement: OPENB Simple_Statements . CLOSEB
+   39 statement: FOR ID EQ expr . ',' expr block
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    ID      shift, and go to state 64
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    CLOSEB  shift, and go to state 138
-    ';'     shift, and go to state 50
-
-    Simple_Statement       go to state 79
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    ','    shift, and go to state 157
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
 
 
 State 134
 
-   54 Conditional_Statement: IF OPENC Expression CLOSEC Statement ELSE . Statement
+   37 statement: IF OPENC expr CLOSEC . block ELSE block
+   38          | IF OPENC expr CLOSEC . block
 
-    ID      shift, and go to state 64
-    IF      shift, and go to state 44
-    PRINT   shift, and go to state 45
-    THIS    shift, and go to state 46
-    WHILE   shift, and go to state 47
-    RETURN  shift, and go to state 48
-    OPENB   shift, and go to state 121
-    ';'     shift, and go to state 50
+    OPENB  shift, and go to state 45
 
-    Statement              go to state 139
-    Simple_Statement       go to state 123
-    Name                   go to state 56
-    Variable_Access        go to state 57
-    Conditional_Statement  go to state 58
+    block  go to state 158
 
 
 State 135
 
-   70 New_Expression: NEW ID '[' Expression ']' .
+   76 expr: OPENC expr CLOSEC .
 
-    $default  reduce using rule 70 (New_Expression)
+    $default  reduce using rule 76 (expr)
 
 
 State 136
 
-   69 New_Expression: NEW INT '[' Expression ']' .
+   61 expr: expr . OR expr
+   61     | expr OR expr .
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 69 (New_Expression)
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    $default  reduce using rule 61 (expr)
 
 
 State 137
 
-   49 Field_Access: ID '[' Expression ']' .
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   62     | expr AND expr .
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 49 (Field_Access)
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    $default  reduce using rule 62 (expr)
 
 
 State 138
 
-   35 Statement: OPENB Simple_Statements CLOSEB .
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   63     | expr EE expr .
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 35 (Statement)
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    $default  reduce using rule 63 (expr)
 
 
 State 139
 
-   54 Conditional_Statement: IF OPENC Expression CLOSEC Statement ELSE Statement .
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   64     | expr NE expr .
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
 
-    $default  reduce using rule 54 (Conditional_Statement)
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    $default  reduce using rule 64 (expr)
+
+
+State 140
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   66     | expr LE expr .
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    LE  error (nonassociative)
+    LT  error (nonassociative)
+    GE  error (nonassociative)
+    GT  error (nonassociative)
+
+    $default  reduce using rule 66 (expr)
+
+
+State 141
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   65     | expr LT expr .
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    LE  error (nonassociative)
+    LT  error (nonassociative)
+    GE  error (nonassociative)
+    GT  error (nonassociative)
+
+    $default  reduce using rule 65 (expr)
+
+
+State 142
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   67     | expr GE expr .
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    LE  error (nonassociative)
+    LT  error (nonassociative)
+    GE  error (nonassociative)
+    GT  error (nonassociative)
+
+    $default  reduce using rule 67 (expr)
+
+
+State 143
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   68     | expr GT expr .
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    LE  error (nonassociative)
+    LT  error (nonassociative)
+    GE  error (nonassociative)
+    GT  error (nonassociative)
+
+    $default  reduce using rule 68 (expr)
+
+
+State 144
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   69     | expr PLUS expr .
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    MUL  shift, and go to state 121
+    DIV  shift, and go to state 122
+    MOD  shift, and go to state 123
+
+    $default  reduce using rule 69 (expr)
+
+
+State 145
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   70     | expr MINUS expr .
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    MUL  shift, and go to state 121
+    DIV  shift, and go to state 122
+    MOD  shift, and go to state 123
+
+    $default  reduce using rule 70 (expr)
+
+
+State 146
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   71     | expr MUL expr .
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    $default  reduce using rule 71 (expr)
+
+
+State 147
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   72     | expr DIV expr .
+   73     | expr . MOD expr
+
+    $default  reduce using rule 72 (expr)
+
+
+State 148
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+   73     | expr MOD expr .
+
+    $default  reduce using rule 73 (expr)
+
+
+State 149
+
+   53 exprs: exprs ',' . expr
+
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 159
+    literal      go to state 89
+
+
+State 150
+
+   48 method_call: ID OPENC exprs CLOSEC .
+
+    $default  reduce using rule 48 (method_call)
+
+
+State 151
+
+   57 location: ID '[' expr ']' .
+
+    $default  reduce using rule 57 (location)
+
+
+State 152
+
+   35 statement: location assign_op expr ';' .
+
+    $default  reduce using rule 35 (statement)
+
+
+State 153
+
+   78 callout_arg: STRING .
+
+    $default  reduce using rule 78 (callout_arg)
+
+
+State 154
+
+   50 method_call: CALLOUT OPENC STRING ',' callout_args . CLOSEC
+   55 callout_args: callout_args . ',' callout_arg
+
+    ','     shift, and go to state 160
+    CLOSEC  shift, and go to state 161
+
+
+State 155
+
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+   77 callout_arg: expr .
+
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    $default  reduce using rule 77 (callout_arg)
+
+
+State 156
+
+   54 callout_args: callout_arg .
+
+    $default  reduce using rule 54 (callout_args)
+
+
+State 157
+
+   39 statement: FOR ID EQ expr ',' . expr block
+
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 162
+    literal      go to state 89
+
+
+State 158
+
+   37 statement: IF OPENC expr CLOSEC block . ELSE block
+   38          | IF OPENC expr CLOSEC block .
+
+    ELSE  shift, and go to state 163
+
+    $default  reduce using rule 38 (statement)
+
+
+State 159
+
+   53 exprs: exprs ',' expr .
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    $default  reduce using rule 53 (exprs)
+
+
+State 160
+
+   55 callout_args: callout_args ',' . callout_arg
+
+    OPENC    shift, and go to state 79
+    CALLOUT  shift, and go to state 56
+    FALSE    shift, and go to state 80
+    TRUE     shift, and go to state 81
+    MINUS    shift, and go to state 82
+    NOT      shift, and go to state 83
+    ID       shift, and go to state 61
+    NUM      shift, and go to state 84
+    STRING   shift, and go to state 153
+    CHAR     shift, and go to state 85
+
+    method_call  go to state 86
+    location     go to state 87
+    expr         go to state 155
+    callout_arg  go to state 164
+    literal      go to state 89
+
+
+State 161
+
+   50 method_call: CALLOUT OPENC STRING ',' callout_args CLOSEC .
+
+    $default  reduce using rule 50 (method_call)
+
+
+State 162
+
+   39 statement: FOR ID EQ expr ',' expr . block
+   61 expr: expr . OR expr
+   62     | expr . AND expr
+   63     | expr . EE expr
+   64     | expr . NE expr
+   65     | expr . LT expr
+   66     | expr . LE expr
+   67     | expr . GE expr
+   68     | expr . GT expr
+   69     | expr . PLUS expr
+   70     | expr . MINUS expr
+   71     | expr . MUL expr
+   72     | expr . DIV expr
+   73     | expr . MOD expr
+
+    OPENB  shift, and go to state 45
+    OR     shift, and go to state 111
+    AND    shift, and go to state 112
+    EE     shift, and go to state 113
+    NE     shift, and go to state 114
+    LE     shift, and go to state 115
+    LT     shift, and go to state 116
+    GE     shift, and go to state 117
+    GT     shift, and go to state 118
+    PLUS   shift, and go to state 119
+    MINUS  shift, and go to state 120
+    MUL    shift, and go to state 121
+    DIV    shift, and go to state 122
+    MOD    shift, and go to state 123
+
+    block  go to state 165
+
+
+State 163
+
+   37 statement: IF OPENC expr CLOSEC block ELSE . block
+
+    OPENB  shift, and go to state 45
+
+    block  go to state 166
+
+
+State 164
+
+   55 callout_args: callout_args ',' callout_arg .
+
+    $default  reduce using rule 55 (callout_args)
+
+
+State 165
+
+   39 statement: FOR ID EQ expr ',' expr block .
+
+    $default  reduce using rule 39 (statement)
+
+
+State 166
+
+   37 statement: IF OPENC expr CLOSEC block ELSE block .
+
+    $default  reduce using rule 37 (statement)

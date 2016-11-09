@@ -2,6 +2,10 @@
 #include <cstdio>
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <string>
+#include "ast.h"
+#include "visitor.h"
 using namespace std;
 
 //Stuff from flex
@@ -9,6 +13,7 @@ extern "C" int yylex();
 extern "C" int yyparse();
 extern "C" FILE *yyin;
 extern "C" ofstream outflex;
+ASTProgram * start;
 
 ofstream outfile;
 //ofstream outflex;
@@ -108,12 +113,14 @@ void yyerror(const char *s);
 %type <callout_arg> callout_arg
 %type <literal> literal
 
+%%
+
 //grammar
 
-program : CLASS ID OPENB field_decls method_decls CLOSEB { $$ = new ASTProgram(std::string($2), $4, $5); start = $$; }
-				| CLASS ID OPENB field_decls CLOSEB  { $$ = new ASTProgram(std::string($2), $4, NULL); start = $$; }
-				| CLASS ID OPENB method_decls CLOSEB { $$ = new ASTProgram(std::string($2), NULL, $4); start = $$; }
-				| CLASS ID OPENB CLOSEB { $$ = new ASTProgram(std::string($2), NULL, NULL); start = $$; }
+program : CLASS ID OPENB field_decls method_decls CLOSEB { $$ = new ASTProgram(string($2), $4, $5); start = $$; }
+				| CLASS ID OPENB field_decls CLOSEB  { $$ = new ASTProgram(string($2), $4, NULL); start = $$; }
+				| CLASS ID OPENB method_decls CLOSEB { $$ = new ASTProgram(string($2), NULL, $4); start = $$; }
+				| CLASS ID OPENB CLOSEB { $$ = new ASTProgram(string($2), NULL, NULL); start = $$; }
 				;
 
 field_decls : field_decl { $$ = new std::vector<ASTFieldDecl *>(); $$->push_back($1); }
@@ -124,32 +131,32 @@ field_decl : type identifiers ';' { $$ = new ASTFieldDecl($2, $1); }
 					 | type identifier_arrays ';' { $$ = new ASTFieldDecl($2, $1); }
 					 ;
 
-identifiers : ID { $$ = new std::vector<ASTVarIdentifier *>(); $$->push_back(new ASTVarIdentifier(std::string($1))); }
-								| identifiers ',' ID { $1->push_back(new ASTVarIdentifier(std::string($3))); $$ = $1; }
+identifiers : ID { $$ = new std::vector<ASTVarIdentifier *>(); $$->push_back(new ASTVarIdentifier(string($1))); }
+								| identifiers ',' ID { $1->push_back(new ASTVarIdentifier(string($3))); $$ = $1; }
 								;
 
 identifier_arrays : identifier_array { $$ = new std::vector<ASTArrayIdentifier *>(); $$->push_back($1); }
 											| identifier_arrays ',' identifier_array { $1->push_back($3); $$ = $1; }
 											;
 
-identifier_array : ID '[' NUM ']' { $$ = new ASTArrayIdentifier(std::string($1), $3); }
+identifier_array : ID '[' NUM ']' { $$ = new ASTArrayIdentifier(string($1), $3); }
 								 ;
 
 method_decls : method_decl { $$ = new std::vector<ASTMethodDecl *>(); $$->push_back($1); }
 								 | method_decls method_decl { $1->push_back($2); $$ = $1; }
 								 ;
 
-method_decl : type ID OPENC type_identifiers CLOSEC block { $$ = new ASTMethodDecl(std::string($2), $1, $4, $6); }
-						| type ID OPENC CLOSEC block { $$ = new ASTMethodDecl(std::string($2), $1, NULL, $5); }
-						| VOID ID OPENC type_identifiers CLOSEC block { $$ = new ASTMethodDecl(std::string($2), Datatype::void_type, $4, $6); }
-						| VOID ID OPENC CLOSEC block { $$ = new ASTMethodDecl(std::string($2), Datatype::void_type, NULL, $5); }
+method_decl : type ID OPENC type_identifiers CLOSEC block { $$ = new ASTMethodDecl(string($2), $1, $4, $6); }
+						| type ID OPENC CLOSEC block { $$ = new ASTMethodDecl(string($2), $1, NULL, $5); }
+						| VOID ID OPENC type_identifiers CLOSEC block { $$ = new ASTMethodDecl(string($2), Datatype::void_type, $4, $6); }
+						| VOID ID OPENC CLOSEC block { $$ = new ASTMethodDecl(string($2), Datatype::void_type, NULL, $5); }
 						;
 
 type_identifiers : type_identifier { $$ = new std::vector<ASTTypeIdentifier *>(); $$->push_back($1); }
 										 | type_identifiers ',' type_identifier { $1->push_back($3); $$ = $1; }
 										 ;
 
-type_identifier : type ID { $$ = new ASTTypeIdentifier(std::string($2), $1); }
+type_identifier : type ID { $$ = new ASTTypeIdentifier(string($2), $1); }
 								;
 
 block : OPENB var_decls statements CLOSEB { $$ = new ASTBlockStatement($3, $2); } 
@@ -178,7 +185,7 @@ statement : ';' { $$ = NULL; }
 					| method_call ';' { $$ = $1; }
 					| IF OPENC expr CLOSEC block ELSE block { $$ = new ASTIfStatement($3, $5, $7); }
 					| IF OPENC expr CLOSEC block { $$ = new ASTIfStatement($3, $5, NULL); }
-					| FOR ID EQ expr ',' expr block { $$ = new ASTForStatement($4, $6, $7, std::string($2)); }
+					| FOR ID EQ expr ',' expr block { $$ = new ASTForStatement($4, $6, $7, string($2)); }
 					| RETURN expr ';' { $$ = new ASTReturnStatement($2); }
 					| RETURN ';' { $$ = new ASTReturnStatement(NULL); }
 					| BREAK ';' { $$ = new ASTBreakStatement(); }
@@ -186,15 +193,15 @@ statement : ';' { $$ = NULL; }
 					| block { $$ = $1; }
 					;
 
-assign_op : EQ { $$ = AssignOp::EQ; }
-					| PE { $$ = AssignOp::plus_EQ; }
-					| ME { $$ = AssignOp::minus_EQ; }
+assign_op : EQ { $$ = AssignOp::equal; }
+					| PE { $$ = AssignOp::plus_equal; }
+					| ME { $$ = AssignOp::minus_equal; }
 					;
 
-method_call : ID OPENC exprs CLOSEC { $$ = new ASTNormalMethod(std::string($1), $3); }
-						| ID OPENC CLOSEC { $$ = new ASTNormalMethod(std::string($1), NULL); }
-						| CALLOUT OPENC STRING ',' callout_args CLOSEC { $$ = new ASTCalloutMethod(std::string($3), $5); }
-						| CALLOUT OPENC STRING CLOSEC { $$ = new ASTCalloutMethod(std::string($3), NULL); }
+method_call : ID OPENC exprs CLOSEC { $$ = new ASTNormalMethod(string($1), $3); }
+						| ID OPENC CLOSEC { $$ = new ASTNormalMethod(string($1), NULL); }
+						| CALLOUT OPENC STRING ',' callout_args CLOSEC { $$ = new ASTCalloutMethod(string($3), $5); }
+						| CALLOUT OPENC STRING CLOSEC { $$ = new ASTCalloutMethod(string($3), NULL); }
 						;
 	
 exprs : expr { $$ = new std::vector<ASTExpression *>(); $$->push_back($1); }
@@ -205,8 +212,8 @@ callout_args : callout_arg { $$ = new std::vector<ASTCalloutArg *>(); $$->push_b
 								 | callout_args ',' callout_arg { $1->push_back($3); $$ = $1; }
 								 ;
 
-location : ID { $$ = new ASTVarLocation(std::string($1)); }
-				 | ID '[' expr ']' { $$ = new ASTArrayLocation(std::string($1), $3); }
+location : ID { $$ = new ASTVarLocation(string($1)); }
+				 | ID '[' expr ']' { $$ = new ASTArrayLocation(string($1), $3); }
 				 ;
 
 expr : location { $$ = $1; }
@@ -214,11 +221,11 @@ expr : location { $$ = $1; }
 		 | literal { $$ = $1; }
 		 | expr OR expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::or_op); }
 		 | expr AND expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::and_op); }
-		 | expr EE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::EQEQ_op); }
-		 | expr NE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::notEQ_op); }
+		 | expr EE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::equalequal_op); }
+		 | expr NE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::notequal_op); }
 		 | expr LT expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::lessthan_op); }
-		 | expr LE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::lessEQ_op); }
-		 | expr GE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::greaterEQ_op); }
+		 | expr LE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::lessequal_op); }
+		 | expr GE expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::greaterequal_op); }
 		 | expr GT expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::greaterthan_op); }
 		 | expr PLUS expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::plus_op); }
 		 | expr MINUS expr { $$ = new ASTBinaryOperationExpression($1, $3, BinOp::minus_op); }
@@ -231,7 +238,7 @@ expr : location { $$ = $1; }
 		 ;
 
 callout_arg : expr  { $$ = new ASTExpressionCalloutArg($1); }
-						| STRING { $$ = new ASTStringCalloutArg(std::string($1)); }
+						| STRING { $$ = new ASTStringCalloutArg(string($1)); }
 						;
 
 literal : NUM { $$ = new ASTIntegerLiteralExpression($1); }

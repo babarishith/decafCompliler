@@ -1,0 +1,43 @@
+class Program
+{
+    int x[1000];
+    int y[1000];
+
+    void main()
+    {
+        int a, b, c, d;
+        int j;
+      
+        // load arrays
+	for j = 0, 1000 {
+            x[j] = j;
+            y[j] = 0;
+            j+=1;
+
+        }
+        
+      	for j = 0, 998 {
+	  int i;
+
+	  i = 998 - j; 
+	  a = x[i + 1];
+	  b = x[i];
+	  c = x[i - 1];
+	  
+	  d = b * 2;
+	  d = d + a;
+	  d = d + c;
+	  
+	  y[i] = d;
+      j+=1;
+	}	
+
+        
+	for j = 0, 1000 {
+            callout("printf", "%d ", y[j]);
+            j+=1;
+        }
+        
+        callout("printf", " ");
+    }
+}
